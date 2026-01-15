@@ -1,0 +1,80 @@
+# Dependencies
+node_modules/
+venv/
+env/
+ENV/
+.venv
+env.bak/
+venv.bak/
+
+# Environment variables
+.env
+.env.local
+.envrc
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+*.o
+*.exe
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+.yarn-integrity
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+*$py.class
+.pytest_cache/
+.tox/
+htmlcov/
+.coverage
+.coverage.*
+*.egg-info/
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Flask 
+instance/
+.webassets-cache
+
+# Node.js / npm
+package-lock.json
+yarn.lock
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# VS Code history
+.history/
+.vsix
+
+# Temporary files
+.tmp/
+*.tmp
