@@ -1,14 +1,27 @@
 -- Datenbankschema 
 
+-- Tabelle für Benutzer
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP
+);
+
 -- Tabelle für Standorte
 CREATE TABLE IF NOT EXISTS locations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
     name TEXT NOT NULL UNIQUE,
     lighting_condition TEXT CHECK(lighting_condition IN ('schatten', 'halbschatten', 'sonnig')),
     temperature TEXT CHECK(temperature IN ('kalt', 'kuehl', 'warm')),
     humidity TEXT CHECK(humidity IN ('trocken', 'normal', 'feucht')),
     description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Tabelle für Pflanzen
@@ -45,3 +58,4 @@ CREATE TABLE IF NOT EXISTS plants (
 -- Indizes für Performance
 CREATE INDEX IF NOT EXISTS idx_plants_location ON plants(location_id);
 CREATE INDEX IF NOT EXISTS idx_plants_purchased ON plants(is_purchased);
+CREATE INDEX IF NOT EXISTS idx_locations_user ON locations(user_id);
