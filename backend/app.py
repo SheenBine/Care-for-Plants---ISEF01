@@ -2,6 +2,7 @@ import os
 from flask import Flask, request, render_template, redirect, url_for
 from models import db, User
 
+# localhost:5000/ http://localhost:5000/
 # Flask-App erstellen
 app = Flask(__name__)
 
