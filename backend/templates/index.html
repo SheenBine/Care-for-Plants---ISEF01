@@ -6,8 +6,26 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}"></link> <!-- from flask import url_for -->
     <title>Start</title>
 </head>
+
 <body>
-    Es klappt!
+    <h1>Es klappt!</h1>
+
+    <!-- kommt später in login.html -->
+    <!-- Login Bar -->
+    <div class="login_box">
+		<form id="loginform">
+			<label for="vname">Anmeldename:
+                <input id="input_username">
+            </label>
+            <br>
+            <label for="vname">Passwort:
+                <input type="password" id="input_passwort">
+            </label>
+            <br>
+            <button type="button" id="anmelden_button">Anmelden</button>
+		</form>
+	</div>
+
 </body>
 </html>
 
