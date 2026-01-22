@@ -10,9 +10,37 @@ body {
     box-sizing: border-box;
 }
 
+
+/* == Login Bar == */
 .login_box {
-    background-color: grey;
-    
+    display: inline-block;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
 }
+
+#create_accound_form {
+    visibility: hidden;
+}
+
+#visibility_button {
+    height: 34px;
+    position: absolute;
+}
+
+#create_accound_form.active {
+    visibility: visible;
+}
+
+#visibility_button.active {
+    visibility: hidden;
+}
+
+
+
+
+
+
 
 
