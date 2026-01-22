@@ -6,9 +6,9 @@ from models import db, User
 # Flask-App erstellen
 app = Flask(__name__)
 
-# Absoluter Pfad zum database-Ordner außerhalb von backend
+# Absoluter Pfad zum Projektordner und zur SQLite-Datei im lokalen database-Ordner
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_DIR, '..', 'database', 'database.db')
+DB_PATH = os.path.join(BASE_DIR, 'database', 'database.db')
 
 # SQLAlchemy-Datenbank-URI
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DB_PATH
