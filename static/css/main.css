@@ -13,7 +13,6 @@ body {
 
 /* == Header Bereich == */
 
-    /*Navigation*/
 .header_Leiste{
     width: 100%;
     background-color: rgb(7, 103, 52);
@@ -23,12 +22,10 @@ body {
 
 .header_Leiste > div {
     text-align: center;
-}
-
-.header_Leiste > div {
-    text-align: center;
     margin-right: 10%;
 }
+
+   /*Navigation*/
 
 .nav_Leiste{
     width: 100%;
