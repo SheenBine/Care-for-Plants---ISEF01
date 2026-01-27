@@ -7,6 +7,39 @@
     <title>Login</title>
 </head>
 <body>
-    Es klappt!
+    <!-- Login Bar -->
+    <div class="login_box">
+		<form id="loginform">
+            <input id="login_username" placeholder="Anmeldename">
+            <br>
+            <input type="password" id="login_passwort" placeholder="Passwort">
+            <br>
+            <button type="button" id="anmelden_button">Anmelden</button>
+		</form>
+	</div>
+
+    <!-- Create Account Bar -->
+    <div class="login_box">
+        <button type="button" id="visibility_button">Neu Registrieren</button>
+		<form id="create_accound_form">
+            <input id="create_accound_username" placeholder="Anmeldename">
+            <br>
+            <input type="password" id="create_accound_passwort" placeholder="Passwort">
+            <br>
+            <button type="button" id="create_accound_button">Registrieren</button>
+		</form>
+	</div>
+
+
+
 </body>
+
+
+<script>
+  document.getElementById('visibility_button').addEventListener('click', function () {
+    document.getElementById('create_accound_form').classList.toggle('active');
+    document.getElementById('visibility_button').classList.toggle('active');
+  });
+</script>
+
 </html>
