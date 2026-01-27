@@ -26,23 +26,23 @@
     <!-- Login Bar -->
     <div class="login_box">
 		<form id="loginform" action="" method="POST">
-            <input id="login_username" placeholder="Anmeldename">
+            <input id="login_username" name="username" placeholder="Anmeldename">
             <br>
-            <input type="password" name="username" id="login_passwort" placeholder="Passwort">
+            <input type="password" name="password" id="login_passwort" placeholder="Passwort">
             <br>
-            <button type="submit" name="password" id="anmelden_button">Anmelden</button>
+            <button type="submit" name="action" value="login" id="anmelden_button">Anmelden</button>
 		</form>
 	</div>
 
     <!-- Create Account Bar -->
     <div class="login_box">
         <button type="button" id="visibility_button">Neu Registrieren</button>
-		<form id="create_accound_form">
-            <input id="create_accound_username" placeholder="Anmeldename">
+		<form id="create_accound_form" action="" method="POST">
+            <input id="create_accound_username" name="username" placeholder="Anmeldename">
             <br>
-            <input type="password" id="create_accound_passwort" placeholder="Passwort">
+            <input type="password" id="create_accound_passwort" name="password" placeholder="Passwort">
             <br>
-            <button type="button" id="create_accound_button">Registrieren</button>
+            <button type="submit" name="action" value="register" id="create_accound_button">Registrieren</button>
 		</form>
 	</div>
 
