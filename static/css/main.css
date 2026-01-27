@@ -25,6 +25,11 @@ body {
     text-align: center;
 }
 
+.header_Leiste > div {
+    text-align: center;
+    margin-right: 10%;
+}
+
 .nav_Leiste{
     width: 100%;
     height: 50px;
