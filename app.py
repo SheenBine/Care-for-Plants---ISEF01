@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, session
 from models import db, User
 
 # localhost:5000/ http://localhost:5000/
@@ -39,9 +39,17 @@ with app.app_context():
 def home():
     '''
     Startseite der App.
-    Zeigt die index.html an.
+    Prüft, ob ein User eingeloggt ist.
+    Falls nicht, wird auf die Login-Seite weitergeleitet.
     '''
-    return render_template('index.html')
+    # Prüfen, ob ein User eingeloggt ist
+    if 'username' not in session:
+        # Kein User eingeloggt -> auf Login weiterleiten
+        return redirect(url_for('auth'))
+    
+    # User ist eingeloggt -> index.html anzeigen
+    # Optional: Username an Template übergeben
+    return render_template('index.html', username=session['username'])
 
 
 @app.route('/auth', methods=['GET', 'POST'])
@@ -65,7 +73,10 @@ def auth():
                 user.set_password(password)
                 db.session.add(user)
                 db.session.commit()
-                return f"Registrierung erfolgreich! Willkommen {username}!"
+                # Nach erfolgreicher Registrierung direkt einloggen
+                session['username'] = username
+                session['user_id'] = user.id
+                return redirect(url_for('home'))
             except Exception as e:
                 db.session.rollback()
                 return f"Fehler bei der Registrierung: {str(e)}"
@@ -74,12 +85,27 @@ def auth():
         elif action == 'login':
             user = User.query.filter_by(username=username).first()
             if user and user.check_password(password):
-                return f"Login erfolgreich! Willkommen {username}!"
+                # Session erstellen und Username speichern
+                session['username'] = username
+                session['user_id'] = user.id
+                # Auf die Startseite weiterleiten
+                return redirect(url_for('home'))
             else:
                 return "Login fehlgeschlagen!"
 
     # Standardmäßig GET, um Login/Registrierung zu zeigen
     return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    '''
+    Logout-Route.
+    Löscht die Session und leitet auf die Login-Seite weiter.
+    '''
+    session.pop('username', None)
+    session.pop('user_id', None)
+    return redirect(url_for('auth'))
 
 
 # App starten
