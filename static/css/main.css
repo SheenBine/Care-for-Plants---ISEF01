@@ -18,6 +18,7 @@ body {
     background-color: rgb(7, 103, 52);
     padding-left: 10%;
     display: inline-block;
+    border-bottom: 3px solid black;
 }
 
 .header_Leiste > div {
@@ -49,6 +50,9 @@ body {
 .nav_Leiste > ul > li > a {
     margin-top: .75rem;
     display: inline-block;
+    border: 2px solid black;
+    min-width:100px;
+    text-align: center;
 }
 
 .nav_Leiste > ul > li > a:link{
@@ -86,6 +90,17 @@ body {
     margin-top: 10%;
 }
 
+.login_box > form > input {
+    height:50px;
+    width:300px;
+    font-size: 2em;
+}
+
+.login_box > form > button {
+    height:50px;
+    width:200px;
+    font-size: 2em;
+}
 
 #create_accound_form {
     visibility: hidden;
