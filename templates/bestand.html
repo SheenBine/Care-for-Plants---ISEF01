@@ -28,6 +28,40 @@
 
         </header>
 
+
+        <!-- Content Bereich -->
+        <div class="continer">
+            <div class="row">
+                <!-- Standort Buttons -->
+                <div class="col-2">
+                    <button type="submit" name="action" value="Alle Pflanzen">Alle Pflanzen</button>
+
+                </div>
+                <!-- Tabelle mit Pflanzen -->
+                <div class="col-4">
+                    <table>
+                        <tr>
+                            <th>1</th>
+                            <th>2</th>
+                            <th>2</th>
+                        </tr>
+                        <!-- {% for pflanze in pflanzen %} -->
+                        <tr>
+                            <td><!--{{ pflanze.1 }}--></td>
+                            <td><!--{{ pflanze.2 }}--></td>
+                            <td>
+                                <!-- <a href="/delete/{{pflanze.id}}">Löschen</a>-->
+                                <br>
+                                <!-- <a href="/update/{{pflanze.id}}">Update</a>-->
+                            </td>
+                        </tr>
+                        <!-- {% endfor %}-->
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
 </body>
 
 

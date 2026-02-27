@@ -171,4 +171,34 @@ body {
 
 
 
+/* == Content Bereich == */
+.continer {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 10%;
+}
+
+.row::after{
+    content: "";
+    clear: both;
+    display: block;
+}
+
+[class*='col-'] {
+    float: left;
+    min-height: 1px;
+    padding: .8rem;
+}
+
+.col-2{width: 33.333%;}
+
+.col-4{width: 66.666%;}
+
+@media (max-width: 768px){
+    .col-2{width: 100%;}
+    .col-4{width: 100%;}
+}
+
+
 
