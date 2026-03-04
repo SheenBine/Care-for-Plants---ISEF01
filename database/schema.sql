@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS locations (
 -- Tabelle für Pflanzen
 CREATE TABLE IF NOT EXISTS plants (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     botanical_name TEXT,
 
