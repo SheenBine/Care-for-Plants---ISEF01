@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS locations (
     user_id INTEGER NOT NULL,
     name TEXT NOT NULL UNIQUE,
     lighting_condition TEXT CHECK(lighting_condition IN ('schatten', 'halbschatten', 'sonnig')),
-    temperature TEXT CHECK(temperature IN ('kalt', 'kuehl', 'warm')),
+    temperature TEXT CHECK(temperature IN ('kalt', 'normal', 'warm')),
     humidity TEXT CHECK(humidity IN ('trocken', 'normal', 'feucht')),
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
