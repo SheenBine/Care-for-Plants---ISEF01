@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request, render_template, redirect, url_for, session
-from models import db, User
+from models import db, User, Location, Plant
 
 # localhost:5000/ http://localhost:5000/
 # Flask-App erstellen
