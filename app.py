@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template, redirect, url_for, session
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 from models import db, User, Location, Plant
 
 # localhost:5000/ http://localhost:5000/
@@ -33,6 +33,15 @@ with app.app_context():
         except Exception as e:
             db.session.rollback()
             print(f"Fehler beim Anlegen des Testusers: {e}")
+
+def require_login():
+    '''
+    Prüft, ob User eingeloggt. Wenn nicht: JSON-Fehlermeldung
+    '''
+    user_id = session.get('user_id')
+    if not user_id:
+        return None, (jsonify({"error": "Nicht eingeloggt"}), 401)
+    return user_id, None
 
 # Routen
 @app.route('/')
