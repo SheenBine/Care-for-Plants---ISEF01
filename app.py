@@ -152,7 +152,7 @@ def list_wishlist():
     ]), 200
 
 
-@app.route('/api/wishlist', methods=['POST'])
+@app.route('/wishlist', methods=['POST'])
 def add_wishlist_item():
     '''
     Pflanze zur Wunschliste hinzufügen
@@ -205,7 +205,7 @@ def add_wishlist_item():
         return jsonify({"error": f"Fehler beim Hinzufügen: {str(e)}"}), 400
 
 
-@app.route('/api/wishlist/<int:plant_id>', methods=['DELETE'])
+@app.route('/wishlist/<int:plant_id>', methods=['DELETE'])
 def remove_wishlist_item(plant_id):
     '''
     Pflanze von der Wunschliste entfernen
@@ -227,7 +227,7 @@ def remove_wishlist_item(plant_id):
         return jsonify({"error": f"Fehler beim Entfernen: {str(e)}"}), 400
 
 
-@app.route('/api/locations', methods=['GET'])
+@app.route('/locations', methods=['GET'])
 def list_locations():
     '''
     Standorte anzeigen
@@ -252,7 +252,7 @@ def list_locations():
     ]), 200
 
 
-@app.route('/api/locations', methods=['POST'])
+@app.route('/locations', methods=['POST'])
 def create_location():
     '''
     Standort anlegen
@@ -286,7 +286,7 @@ def create_location():
         return jsonify({"error": f"Fehler beim Erstellen: {str(e)}"}), 400
 
 
-@app.route('/api/locations/<int:location_id>', methods=['DELETE'])
+@app.route('/locations/<int:location_id>', methods=['DELETE'])
 def delete_location(location_id):
     '''
     Standort löschen
@@ -307,6 +307,122 @@ def delete_location(location_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": f"Fehler beim Löschen: {str(e)}"}), 400
+
+
+@app.route('/inventory', methods=['GET'])
+def list_inventory():
+    '''
+    Bestand anzeigen
+    Das sind Plants mit is_purchased = True
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
+
+    plants = Plant.query.filter_by(user_id=user_id, is_purchased=True).order_by(Plant.created_at.desc()).all()
+
+    return jsonify([
+        {
+            "id": p.id,
+            "name": p.name,
+            "botanical_name": p.botanical_name,
+            "location_id": p.location_id,
+            "notes": p.notes,
+            "created_at": str(p.created_at)
+        }
+        for p in plants
+    ]), 200
+
+
+@app.route('/inventory', methods=['POST'])
+def add_inventory_item():
+    '''
+    Pflanze direkt in den Bestand hinzufügen
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
+
+    data = request.get_json(silent=True) or {}
+
+    name = (data.get("name") or "").strip()
+    if not name:
+        return jsonify({"error": "Bitte Name eingeben"}), 400
+
+    # Standort prüfen (muss dem User gehören)
+    location_id = data.get("location_id")
+    if location_id is not None:
+        loc = Location.query.filter_by(id=location_id, user_id=user_id).first()
+        if not loc:
+            return jsonify({"error": "Standort ungültig"}), 400
+
+    try:
+        plant = Plant(
+            user_id=user_id,
+            name=name,
+            botanical_name=data.get("botanical_name"),
+            notes=data.get("notes"),
+            is_purchased=True,
+            location_id=location_id
+        )
+        db.session.add(plant)
+        db.session.commit()
+
+        return jsonify({"id": plant.id, "message": "Zum Bestand hinzugefügt"}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Fehler beim Hinzufügen: {str(e)}"}), 400
+
+
+@app.route('/plants/<int:plant_id>', methods=['PATCH'])
+def update_plant(plant_id):
+    '''
+    Pflanze updaten
+    - Wunschliste -> Bestand (is_purchased = True)
+    - Bestand -> Wunschliste (is_purchased = False)
+    - Standort zuordnen/ändern (location_id)
+    - Standort entfernen (location_id = null)
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
+
+    plant = Plant.query.filter_by(id=plant_id, user_id=user_id).first()
+    if not plant:
+        return jsonify({"error": "Pflanze nicht gefunden"}), 404
+
+    data = request.get_json(silent=True) or {}
+
+    # is_purchased setzen (Wishlist <-> Bestand)
+    if "is_purchased" in data:
+        plant.is_purchased = bool(data.get("is_purchased"))
+
+    # notes setzen
+    if "notes" in data:
+        plant.notes = data.get("notes")
+
+    # Standort zuordnen / entfernen
+    if "location_id" in data:
+        location_id = data.get("location_id")
+
+        # location_id = null -> Zuordnung entfernen
+        if location_id is None:
+            plant.location_id = None
+        else:
+            # Standort muss existieren und dem User gehören
+            loc = Location.query.filter_by(id=location_id, user_id=user_id).first()
+            if not loc:
+                return jsonify({"error": "Standort ungültig"}), 400
+            plant.location_id = location_id
+
+    try:
+        db.session.commit()
+        return jsonify({"message": "Pflanze aktualisiert"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Fehler beim Aktualisieren: {str(e)}"}), 400
+
 
 # App starten
 if __name__ == '__main__':
