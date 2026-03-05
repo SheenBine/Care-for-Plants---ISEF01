@@ -309,6 +309,37 @@ def delete_location(location_id):
         return jsonify({"error": f"Fehler beim Löschen: {str(e)}"}), 400
 
 
+@app.route('/locations/<int:location_id>/plants', methods=['GET'])
+def list_plants_by_location(location_id):
+    '''
+    Pflanzen pro Standort anzeigen
+    - Standort muss dem eingeloggten User gehören.
+    - Gibt Pflanzen zurück, die diesem Standort zugeordnet sind.
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
+
+    # Standort prüfen
+    loc = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    if not loc:
+        return jsonify({"error": "Standort nicht gefunden"}), 404
+
+    plants = Plant.query.filter_by(user_id=user_id, location_id=location_id).order_by(Plant.created_at.desc()).all()
+
+    return jsonify([
+        {
+            "id": p.id,
+            "name": p.name,
+            "botanical_name": p.botanical_name,
+            "is_purchased": bool(p.is_purchased),
+            "location_id": p.location_id,
+            "notes": p.notes,
+            "created_at": str(p.created_at)
+        }
+        for p in plants
+    ]), 200
+
 @app.route('/inventory', methods=['GET'])
 def list_inventory():
     '''
