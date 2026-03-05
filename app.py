@@ -227,6 +227,87 @@ def api_remove_wishlist_item(plant_id):
         return jsonify({"error": f"Fehler beim Entfernen: {str(e)}"}), 400
 
 
+@app.route('/api/locations', methods=['GET'])
+def api_list_locations():
+    '''
+    Standorte anzeigen
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
+
+    locations = Location.query.filter_by(user_id=user_id).order_by(Location.created_at.desc()).all()
+
+    return jsonify([
+        {
+            "id": loc.id,
+            "name": loc.name,
+            "lighting_condition": loc.lighting_condition,
+            "temperature": loc.temperature,
+            "humidity": loc.humidity,
+            "description": loc.description,
+            "created_at": str(loc.created_at)
+        }
+        for loc in locations
+    ]), 200
+
+
+@app.route('/api/locations', methods=['POST'])
+def api_create_location():
+    '''
+    Standort anlegen
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
+
+    data = request.get_json(silent=True) or {}
+
+    name = (data.get("name") or "").strip()
+    if not name:
+        return jsonify({"error": "Bitte Name eingeben"}), 400
+
+    try:
+        loc = Location(
+            user_id=user_id,
+            name=name,
+            lighting_condition=data.get("lighting_condition"),
+            temperature=data.get("temperature"),
+            humidity=data.get("humidity"),
+            description=data.get("description")
+        )
+        db.session.add(loc)
+        db.session.commit()
+
+        return jsonify({"id": loc.id, "message": "Standort erstellt"}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Fehler beim Erstellen: {str(e)}"}), 400
+
+
+@app.route('/api/locations/<int:location_id>', methods=['DELETE'])
+def api_delete_location(location_id):
+    '''
+    Standort löschen
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
+
+    loc = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    if not loc:
+        return jsonify({"error": "Standort nicht gefunden"}), 404
+
+    try:
+        db.session.delete(loc)
+        db.session.commit()
+        return jsonify({"message": "Standort gelöscht"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Fehler beim Löschen: {str(e)}"}), 400
+
 # App starten
 if __name__ == '__main__':
     app.run(debug=True)
