@@ -409,11 +409,10 @@ def add_inventory_item():
 @app.route('/plants/<int:plant_id>', methods=['PATCH'])
 def update_plant(plant_id):
     '''
-    Pflanze updaten
-    - Wunschliste -> Bestand (is_purchased = True)
-    - Bestand -> Wunschliste (is_purchased = False)
-    - Standort zuordnen/ändern (location_id)
-    - Standort entfernen (location_id = null)
+    - Wunschliste <-> Bestand 
+    - Standort zuordnen/ändern/entfernen
+    - Pflanzen-Eigenschaften ergänzen/ändern
+
     '''
     user_id, err = require_login()
     if err:
@@ -425,15 +424,60 @@ def update_plant(plant_id):
 
     data = request.get_json(silent=True) or {}
 
-    # is_purchased setzen (Wishlist <-> Bestand)
-    if "is_purchased" in data:
-        plant.is_purchased = bool(data.get("is_purchased"))
+    # Eigenschaften
+    if "name" in data:
+        name = (data.get("name") or "").strip()
+        if not name:
+            return jsonify({"error": "name darf nicht leer sein"}), 400
+        plant.name = name
 
-    # notes setzen
+    if "botanical_name" in data:
+        plant.botanical_name = data.get("botanical_name")
+
+    if "light_requirement" in data:
+        plant.light_requirement = data.get("light_requirement")
+
+    if "water_requirement" in data:
+        plant.water_requirement = data.get("water_requirement")
+
+    if "temperature_min" in data:
+        plant.temperature_min = data.get("temperature_min")
+
+    if "temperature_max" in data:
+        plant.temperature_max = data.get("temperature_max")
+
+    if "humidity_requirement" in data:
+        plant.humidity_requirement = data.get("humidity_requirement")
+
+    if "soil_type" in data:
+        plant.soil_type = data.get("soil_type")
+
+    if "height_min" in data:
+        plant.height_min = data.get("height_min")
+
+    if "height_max" in data:
+        plant.height_max = data.get("height_max")
+
+    if "poisonous" in data:
+        plant.poisonous = bool(data.get("poisonous"))
+
+    if "flowering_season_start" in data:
+        plant.flowering_season_start = data.get("flowering_season_start")
+
+    if "flowering_season_end" in data:
+        plant.flowering_season_end = data.get("flowering_season_end")
+
+    if "flower_color" in data:
+        plant.flower_color = data.get("flower_color")
+
     if "notes" in data:
         plant.notes = data.get("notes")
 
-    # Standort zuordnen / entfernen
+    # Status: Wunschliste oder Bestand
+    if "is_purchased" in data:
+        plant.is_purchased = bool(data.get("is_purchased"))
+
+    # Standort zuordnen/entfernen
     if "location_id" in data:
         location_id = data.get("location_id")
 
