@@ -118,7 +118,7 @@ def logout():
 
 
 @app.route('/api/wishlist', methods=['GET'])
-def api_list_wishlist():
+def list_wishlist():
     '''
     Wunschliste anzeigen. Also Plants mit is_purchased = False (nur eigene)
     '''
@@ -153,7 +153,7 @@ def api_list_wishlist():
 
 
 @app.route('/api/wishlist', methods=['POST'])
-def api_add_wishlist_item():
+def add_wishlist_item():
     '''
     Pflanze zur Wunschliste hinzufügen
     '''
@@ -206,7 +206,7 @@ def api_add_wishlist_item():
 
 
 @app.route('/api/wishlist/<int:plant_id>', methods=['DELETE'])
-def api_remove_wishlist_item(plant_id):
+def remove_wishlist_item(plant_id):
     '''
     Pflanze von der Wunschliste entfernen
     '''
@@ -228,7 +228,7 @@ def api_remove_wishlist_item(plant_id):
 
 
 @app.route('/api/locations', methods=['GET'])
-def api_list_locations():
+def list_locations():
     '''
     Standorte anzeigen
     '''
@@ -253,7 +253,7 @@ def api_list_locations():
 
 
 @app.route('/api/locations', methods=['POST'])
-def api_create_location():
+def create_location():
     '''
     Standort anlegen
     '''
@@ -287,7 +287,7 @@ def api_create_location():
 
 
 @app.route('/api/locations/<int:location_id>', methods=['DELETE'])
-def api_delete_location(location_id):
+def delete_location(location_id):
     '''
     Standort löschen
     '''
