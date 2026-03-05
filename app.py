@@ -43,6 +43,33 @@ def require_login():
         return None, (jsonify({"error": "Nicht eingeloggt"}), 401)
     return user_id, None
 
+# Validierung der Enum-Felder
+
+ALLOWED_LIGHT = {"schatten", "halbschatten", "sonnig"}
+ALLOWED_TEMP = {"kalt", "normal", "warm"}
+ALLOWED_HUMIDITY = {"trocken", "normal", "feucht"}
+ALLOWED_WATER = {"wenig", "mittel", "viel"}
+
+def validate_enum(field_name, value, allowed_values):
+    '''
+    Prüft ob ein Wert in einer erlaubten Menge liegt
+    - None oder "" wird als "nicht gesetzt" akzeptiert
+    '''
+    if value is None:
+        return True, None
+
+    # Falls Frontend mal "" schickt, behandeln wir es als None
+    if isinstance(value, str) and value.strip() == "":
+        return True, None
+
+    if value not in allowed_values:
+        return False, (jsonify({
+            "error": f"Ungültiger Wert für {field_name}: '{value}'",
+            "allowed": sorted(list(allowed_values))
+        }), 400)
+
+    return True, None
+
 # Routen
 @app.route('/')
 def home():
@@ -267,6 +294,18 @@ def create_location():
     if not name:
         return jsonify({"error": "Bitte Name eingeben"}), 400
 
+    ok, err = validate_enum("lighting_condition", data.get("lighting_condition"), ALLOWED_LIGHT)
+    if not ok:
+        return err
+
+    ok, err = validate_enum("temperature", data.get("temperature"), ALLOWED_TEMP)
+    if not ok:
+        return err
+
+    ok, err = validate_enum("humidity", data.get("humidity"), ALLOWED_HUMIDITY)
+    if not ok:
+        return err
+
     try:
         loc = Location(
             user_id=user_id,
@@ -435,20 +474,44 @@ def update_plant(plant_id):
         plant.botanical_name = data.get("botanical_name")
 
     if "light_requirement" in data:
+        ok, err = validate_enum("light_requirement", data.get("light_requirement"), ALLOWED_LIGHT)
+        if not ok:
+            return err
         plant.light_requirement = data.get("light_requirement")
 
     if "water_requirement" in data:
+        ok, err = validate_enum("water_requirement", data.get("water_requirement"), ALLOWED_WATER)
+        if not ok:
+            return err
         plant.water_requirement = data.get("water_requirement")
 
-    if "temperature_min" in data:
-        plant.temperature_min = data.get("temperature_min")
-
-    if "temperature_max" in data:
-        plant.temperature_max = data.get("temperature_max")
-
     if "humidity_requirement" in data:
+        ok, err = validate_enum("humidity_requirement", data.get("humidity_requirement"), ALLOWED_HUMIDITY)
+        if not ok:
+            return err
         plant.humidity_requirement = data.get("humidity_requirement")
 
+    if "temperature_min" in data:
+        try:
+            temp_min = int(data.get("temperature_min"))
+            plant.temperature_min = temp_min
+        except (TypeError, ValueError):
+            return jsonify({"error": "temperature_min muss eine Zahl sein"}), 400
+
+    # Temperatur Maximum
+    if "temperature_max" in data:
+        try:
+            temp_max = int(data.get("temperature_max"))
+            plant.temperature_max = temp_max
+        except (TypeError, ValueError):
+            return jsonify({"error": "temperature_max muss eine Zahl sein"}), 400
+
+    # Prüfen ob min <= max
+    if plant.temperature_min is not None and plant.temperature_max is not None:
+        if plant.temperature_min > plant.temperature_max:
+            return jsonify({
+                "error": "temperature_min darf nicht größer als temperature_max sein"
+            }), 400
     if "soil_type" in data:
         plant.soil_type = data.get("soil_type")
 
