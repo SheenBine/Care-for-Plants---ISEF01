@@ -162,8 +162,7 @@ def list_wishlist():
             "botanical_name": p.botanical_name,
             "light_requirement": p.light_requirement,
             "water_requirement": p.water_requirement,
-            "temperature_min": p.temperature_min,
-            "temperature_max": p.temperature_max,
+            "temperature_requirement": p.temperature_requirement,
             "humidity_requirement": p.humidity_requirement,
             "soil_type": p.soil_type,
             "height_min": p.height_min,
@@ -194,6 +193,22 @@ def add_wishlist_item():
     if not name:
         return jsonify({"error": "Bitte geben Sie einen Namen ein."}), 400
 
+    ok, err = validate_enum("light_requirement", data.get("light_requirement"), ALLOWED_LIGHT)
+    if not ok:
+        return err
+
+    ok, err = validate_enum("water_requirement", data.get("water_requirement"), ALLOWED_WATER)
+    if not ok:
+        return err
+
+    ok, err = validate_enum("humidity_requirement", data.get("humidity_requirement"), ALLOWED_HUMIDITY)
+    if not ok:
+        return err
+
+    ok, err = validate_enum("temperature_requirement", data.get("temperature_requirement"), ALLOWED_TEMP)
+    if not ok:
+        return err
+
     try:
         plant = Plant(
             user_id=user_id,
@@ -202,8 +217,7 @@ def add_wishlist_item():
 
             light_requirement=data.get("light_requirement"),
             water_requirement=data.get("water_requirement"),
-            temperature_min=data.get("temperature_min"),
-            temperature_max=data.get("temperature_max"),
+            temperature_requirement=data.get("temperature_requirement"),
             humidity_requirement=data.get("humidity_requirement"),
             soil_type=data.get("soil_type"),
 
@@ -491,27 +505,15 @@ def update_plant(plant_id):
             return err
         plant.humidity_requirement = data.get("humidity_requirement")
 
-    if "temperature_min" in data:
-        try:
-            temp_min = int(data.get("temperature_min"))
-            plant.temperature_min = temp_min
-        except (TypeError, ValueError):
-            return jsonify({"error": "temperature_min muss eine Zahl sein"}), 400
+    if "temperature_requirement" in data:
+        ok, err = validate_enum("temperature_requirement",
+                                data.get("temperature_requirement"),
+                                ALLOWED_TEMP)
+        if not ok:
+            return err
 
-    # Temperatur Maximum
-    if "temperature_max" in data:
-        try:
-            temp_max = int(data.get("temperature_max"))
-            plant.temperature_max = temp_max
-        except (TypeError, ValueError):
-            return jsonify({"error": "temperature_max muss eine Zahl sein"}), 400
+        plant.temperature_requirement = data.get("temperature_requirement")
 
-    # Prüfen ob min <= max
-    if plant.temperature_min is not None and plant.temperature_max is not None:
-        if plant.temperature_min > plant.temperature_max:
-            return jsonify({
-                "error": "temperature_min darf nicht größer als temperature_max sein"
-            }), 400
     if "soil_type" in data:
         plant.soil_type = data.get("soil_type")
 

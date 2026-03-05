@@ -72,8 +72,7 @@ class Plant(db.Model):
     # Standortanforderungen
     light_requirement = db.Column(db.String(20))      # schatten, halbschatten, sonnig
     water_requirement = db.Column(db.String(20))      # wenig, mittel, viel
-    temperature_min = db.Column(db.Integer)
-    temperature_max = db.Column(db.Integer)
+    temperature_requirement = db.Column(db.String(20))
     humidity_requirement = db.Column(db.String(20))   # trocken, normal, feucht
     soil_type = db.Column(db.String(120))
 
