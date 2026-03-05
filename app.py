@@ -117,10 +117,10 @@ def logout():
     return redirect(url_for('auth'))
 
 
-@app.route('/api/wishlist', methods=['GET'])
+@app.route('/wishlist', methods=['GET'])
 def list_wishlist():
     '''
-    Wunschliste anzeigen. Also Plants mit is_purchased = False (nur eigene)
+    Wunschliste anzeigen. Also Plants mit is_purchased = False
     '''
     user_id, err = require_login()
     if err:
