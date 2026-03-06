@@ -43,6 +43,33 @@ def require_login():
         return None, (jsonify({"error": "Nicht eingeloggt"}), 401)
     return user_id, None
 
+# Validierung der Enum-Felder
+
+ALLOWED_LIGHT = {"schatten", "halbschatten", "sonnig"}
+ALLOWED_TEMP = {"kalt", "normal", "warm"}
+ALLOWED_HUMIDITY = {"trocken", "normal", "feucht"}
+ALLOWED_WATER = {"wenig", "mittel", "viel"}
+
+def validate_enum(field_name, value, allowed_values):
+    '''
+    Prüft ob ein Wert in einer erlaubten Menge liegt
+    - None oder "" wird als "nicht gesetzt" akzeptiert
+    '''
+    if value is None:
+        return True, None
+
+    # Falls Frontend mal "" schickt, behandeln wir es als None
+    if isinstance(value, str) and value.strip() == "":
+        return True, None
+
+    if value not in allowed_values:
+        return False, (jsonify({
+            "error": f"Ungültiger Wert für {field_name}: '{value}'",
+            "allowed": sorted(list(allowed_values))
+        }), 400)
+
+    return True, None
+
 # Routen
 @app.route('/')
 def home():
@@ -117,10 +144,10 @@ def logout():
     return redirect(url_for('auth'))
 
 
-@app.route('/api/wishlist', methods=['GET'])
+@app.route('/wishlist', methods=['GET'])
 def list_wishlist():
     '''
-    Wunschliste anzeigen. Also Plants mit is_purchased = False (nur eigene)
+    Wunschliste anzeigen. Also Plants mit is_purchased = False
     '''
     user_id, err = require_login()
     if err:
@@ -135,8 +162,7 @@ def list_wishlist():
             "botanical_name": p.botanical_name,
             "light_requirement": p.light_requirement,
             "water_requirement": p.water_requirement,
-            "temperature_min": p.temperature_min,
-            "temperature_max": p.temperature_max,
+            "temperature_requirement": p.temperature_requirement,
             "humidity_requirement": p.humidity_requirement,
             "soil_type": p.soil_type,
             "height_min": p.height_min,
@@ -167,6 +193,22 @@ def add_wishlist_item():
     if not name:
         return jsonify({"error": "Bitte geben Sie einen Namen ein."}), 400
 
+    ok, err = validate_enum("light_requirement", data.get("light_requirement"), ALLOWED_LIGHT)
+    if not ok:
+        return err
+
+    ok, err = validate_enum("water_requirement", data.get("water_requirement"), ALLOWED_WATER)
+    if not ok:
+        return err
+
+    ok, err = validate_enum("humidity_requirement", data.get("humidity_requirement"), ALLOWED_HUMIDITY)
+    if not ok:
+        return err
+
+    ok, err = validate_enum("temperature_requirement", data.get("temperature_requirement"), ALLOWED_TEMP)
+    if not ok:
+        return err
+
     try:
         plant = Plant(
             user_id=user_id,
@@ -175,8 +217,7 @@ def add_wishlist_item():
 
             light_requirement=data.get("light_requirement"),
             water_requirement=data.get("water_requirement"),
-            temperature_min=data.get("temperature_min"),
-            temperature_max=data.get("temperature_max"),
+            temperature_requirement=data.get("temperature_requirement"),
             humidity_requirement=data.get("humidity_requirement"),
             soil_type=data.get("soil_type"),
 
@@ -266,6 +307,18 @@ def create_location():
     name = (data.get("name") or "").strip()
     if not name:
         return jsonify({"error": "Bitte Name eingeben"}), 400
+
+    ok, err = validate_enum("lighting_condition", data.get("lighting_condition"), ALLOWED_LIGHT)
+    if not ok:
+        return err
+
+    ok, err = validate_enum("temperature", data.get("temperature"), ALLOWED_TEMP)
+    if not ok:
+        return err
+
+    ok, err = validate_enum("humidity", data.get("humidity"), ALLOWED_HUMIDITY)
+    if not ok:
+        return err
 
     try:
         loc = Location(
@@ -409,11 +462,10 @@ def add_inventory_item():
 @app.route('/plants/<int:plant_id>', methods=['PATCH'])
 def update_plant(plant_id):
     '''
-    Pflanze updaten
-    - Wunschliste -> Bestand (is_purchased = True)
-    - Bestand -> Wunschliste (is_purchased = False)
-    - Standort zuordnen/ändern (location_id)
-    - Standort entfernen (location_id = null)
+    - Wunschliste <-> Bestand 
+    - Standort zuordnen/ändern/entfernen
+    - Pflanzen-Eigenschaften ergänzen/ändern
+
     '''
     user_id, err = require_login()
     if err:
@@ -425,15 +477,72 @@ def update_plant(plant_id):
 
     data = request.get_json(silent=True) or {}
 
-    # is_purchased setzen (Wishlist <-> Bestand)
-    if "is_purchased" in data:
-        plant.is_purchased = bool(data.get("is_purchased"))
+    # Eigenschaften
+    if "name" in data:
+        name = (data.get("name") or "").strip()
+        if not name:
+            return jsonify({"error": "name darf nicht leer sein"}), 400
+        plant.name = name
 
-    # notes setzen
+    if "botanical_name" in data:
+        plant.botanical_name = data.get("botanical_name")
+
+    if "light_requirement" in data:
+        ok, err = validate_enum("light_requirement", data.get("light_requirement"), ALLOWED_LIGHT)
+        if not ok:
+            return err
+        plant.light_requirement = data.get("light_requirement")
+
+    if "water_requirement" in data:
+        ok, err = validate_enum("water_requirement", data.get("water_requirement"), ALLOWED_WATER)
+        if not ok:
+            return err
+        plant.water_requirement = data.get("water_requirement")
+
+    if "humidity_requirement" in data:
+        ok, err = validate_enum("humidity_requirement", data.get("humidity_requirement"), ALLOWED_HUMIDITY)
+        if not ok:
+            return err
+        plant.humidity_requirement = data.get("humidity_requirement")
+
+    if "temperature_requirement" in data:
+        ok, err = validate_enum("temperature_requirement",
+                                data.get("temperature_requirement"),
+                                ALLOWED_TEMP)
+        if not ok:
+            return err
+
+        plant.temperature_requirement = data.get("temperature_requirement")
+
+    if "soil_type" in data:
+        plant.soil_type = data.get("soil_type")
+
+    if "height_min" in data:
+        plant.height_min = data.get("height_min")
+
+    if "height_max" in data:
+        plant.height_max = data.get("height_max")
+
+    if "poisonous" in data:
+        plant.poisonous = bool(data.get("poisonous"))
+
+    if "flowering_season_start" in data:
+        plant.flowering_season_start = data.get("flowering_season_start")
+
+    if "flowering_season_end" in data:
+        plant.flowering_season_end = data.get("flowering_season_end")
+
+    if "flower_color" in data:
+        plant.flower_color = data.get("flower_color")
+
     if "notes" in data:
         plant.notes = data.get("notes")
 
-    # Standort zuordnen / entfernen
+    # Status: Wunschliste oder Bestand
+    if "is_purchased" in data:
+        plant.is_purchased = bool(data.get("is_purchased"))
+
+    # Standort zuordnen/entfernen
     if "location_id" in data:
         location_id = data.get("location_id")
 
