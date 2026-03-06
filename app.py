@@ -80,11 +80,9 @@ def home():
     '''
     # Prüfen, ob ein User eingeloggt ist
     if 'username' not in session:
-        # Kein User eingeloggt -> auf Login weiterleiten
         return redirect(url_for('auth'))
     
     # User ist eingeloggt -> index.html anzeigen
-    # Optional: Username an Template übergeben
     return render_template('index.html', username=session['username'])
 
 
@@ -143,8 +141,95 @@ def logout():
     session.pop('user_id', None)
     return redirect(url_for('auth'))
 
-
 @app.route('/wishlist', methods=['GET'])
+def wishlist_page():
+    '''
+    HTML-Seite für die Wunschliste anzeigen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    return render_template('wunschliste.html', username=session['username'])
+
+
+@app.route('/inventory', methods=['GET'])
+def inventory_page():
+    '''
+    HTML-Seite für den Bestand anzeigen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    return render_template('bestand.html', username=session['username'])
+
+
+@app.route('/locations', methods=['GET'])
+def locations_page():
+    '''
+    HTML-Seite für die Standorte anzeigen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    return render_template('standorte.html', username=session['username'])
+
+
+@app.route('/locations/<int:location_id>/plants', methods=['GET'])
+def location_plants_page(location_id):
+    '''
+    HTML-Seite für Pflanzen eines Standorts anzeigen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    return render_template(
+        'liste_von_pflanzen.html',
+        username=session['username'],
+        location_id=location_id
+    )
+
+
+@app.route('/new_plant', methods=['GET'])
+def new_plant_page():
+    '''
+    HTML-Seite zum Anlegen einer neuen Pflanze anzeigen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    return render_template('neue_pflanze.html', username=session['username'])
+
+
+@app.route('/plants/<int:plant_id>/edit', methods=['GET'])
+def edit_plant_page(plant_id):
+    '''
+    HTML-Seite zum Ändern einer Pflanze anzeigen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    return render_template(
+        'aenderung.html',
+        username=session['username'],
+        plant_id=plant_id
+    )
+
+
+@app.route('/locations/<int:location_id>/edit', methods=['GET'])
+def edit_location_page(location_id):
+    '''
+    HTML-Seite zum Ändern eines Standorts anzeigen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    return render_template(
+        'aendern_standort.html',
+        username=session['username'],
+        location_id=location_id
+    )
+
+@app.route('/api/wishlist', methods=['GET'])
 def list_wishlist():
     '''
     Wunschliste anzeigen. Also Plants mit is_purchased = False
@@ -178,7 +263,7 @@ def list_wishlist():
     ]), 200
 
 
-@app.route('/wishlist', methods=['POST'])
+@app.route('/api/wishlist', methods=['POST'])
 def add_wishlist_item():
     '''
     Pflanze zur Wunschliste hinzufügen
@@ -246,7 +331,7 @@ def add_wishlist_item():
         return jsonify({"error": f"Fehler beim Hinzufügen: {str(e)}"}), 400
 
 
-@app.route('/wishlist/<int:plant_id>', methods=['DELETE'])
+@app.route('/api/wishlist/<int:plant_id>', methods=['DELETE'])
 def remove_wishlist_item(plant_id):
     '''
     Pflanze von der Wunschliste entfernen
@@ -268,7 +353,7 @@ def remove_wishlist_item(plant_id):
         return jsonify({"error": f"Fehler beim Entfernen: {str(e)}"}), 400
 
 
-@app.route('/locations', methods=['GET'])
+@app.route('/api/locations', methods=['GET'])
 def list_locations():
     '''
     Standorte anzeigen
@@ -293,7 +378,7 @@ def list_locations():
     ]), 200
 
 
-@app.route('/locations', methods=['POST'])
+@app.route('/api/locations', methods=['POST'])
 def create_location():
     '''
     Standort anlegen
@@ -339,7 +424,7 @@ def create_location():
         return jsonify({"error": f"Fehler beim Erstellen: {str(e)}"}), 400
 
 
-@app.route('/locations/<int:location_id>', methods=['DELETE'])
+@app.route('/api/locations/<int:location_id>', methods=['DELETE'])
 def delete_location(location_id):
     '''
     Standort löschen
@@ -362,7 +447,7 @@ def delete_location(location_id):
         return jsonify({"error": f"Fehler beim Löschen: {str(e)}"}), 400
 
 
-@app.route('/locations/<int:location_id>/plants', methods=['GET'])
+@app.route('/api/locations/<int:location_id>/plants', methods=['GET'])
 def list_plants_by_location(location_id):
     '''
     Pflanzen pro Standort anzeigen
@@ -393,7 +478,7 @@ def list_plants_by_location(location_id):
         for p in plants
     ]), 200
 
-@app.route('/inventory', methods=['GET'])
+@app.route('/api/inventory', methods=['GET'])
 def list_inventory():
     '''
     Bestand anzeigen
@@ -418,7 +503,7 @@ def list_inventory():
     ]), 200
 
 
-@app.route('/inventory', methods=['POST'])
+@app.route('/api/inventory', methods=['POST'])
 def add_inventory_item():
     '''
     Pflanze direkt in den Bestand hinzufügen
@@ -459,7 +544,7 @@ def add_inventory_item():
         return jsonify({"error": f"Fehler beim Hinzufügen: {str(e)}"}), 400
 
 
-@app.route('/plants/<int:plant_id>', methods=['PATCH'])
+@app.route('/api/plants/<int:plant_id>', methods=['PATCH'])
 def update_plant(plant_id):
     '''
     - Wunschliste <-> Bestand 
