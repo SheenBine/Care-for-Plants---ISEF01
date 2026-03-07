@@ -34,9 +34,144 @@ with app.app_context():
             db.session.rollback()
             print(f"Fehler beim Anlegen des Testusers: {e}")
 
+# Beispiel-Pflanzen für den Pflanzenkatalog
+if PlantCatalog.query.count() == 0:
+    try:
+        example_plants = [
+            PlantCatalog(
+                name="Monstera",
+                botanical_name="Monstera deliciosa",
+                light_requirement="halbschatten",
+                water_requirement="mittel",
+                temperature_requirement="normal",
+                humidity_requirement="normal",
+                soil_type="durchlaessig",
+                height_min=50,
+                height_max=200,
+                flower_color="weiß",
+                poisonous=True,
+                flowering_season_start=6,
+                flowering_season_end=8
+            ),
+            PlantCatalog(
+                name="Bogenhanf",
+                botanical_name="Sansevieria trifasciata",
+                light_requirement="schatten",
+                water_requirement="wenig",
+                temperature_requirement="normal",
+                humidity_requirement="trocken",
+                soil_type="kaktuserde",
+                height_min=30,
+                height_max=120,
+                flower_color="creme",
+                poisonous=True,
+                flowering_season_start=4,
+                flowering_season_end=6
+            ),
+            PlantCatalog(
+                name="Einblatt",
+                botanical_name="Spathiphyllum wallisii",
+                light_requirement="schatten",
+                water_requirement="mittel",
+                temperature_requirement="normal",
+                humidity_requirement="feucht",
+                soil_type="humos",
+                height_min=30,
+                height_max=80,
+                flower_color="weiß",
+                poisonous=True,
+                flowering_season_start=3,
+                flowering_season_end=9
+            ),
+            PlantCatalog(
+                name="Gummibaum",
+                botanical_name="Ficus elastica",
+                light_requirement="halbschatten",
+                water_requirement="mittel",
+                temperature_requirement="normal",
+                humidity_requirement="normal",
+                soil_type="durchlaessig",
+                height_min=60,
+                height_max=250,
+                flower_color="grün",
+                poisonous=True,
+                flowering_season_start=5,
+                flowering_season_end=7
+            ),
+            PlantCatalog(
+                name="Calathea",
+                botanical_name="Calathea orbifolia",
+                light_requirement="halbschatten",
+                water_requirement="mittel",
+                temperature_requirement="warm",
+                humidity_requirement="feucht",
+                soil_type="humos",
+                height_min=30,
+                height_max=90,
+                flower_color="violett",
+                poisonous=False,
+                flowering_season_start=6,
+                flowering_season_end=8
+            ),
+            PlantCatalog(
+                name="Aloe Vera",
+                botanical_name="Aloe barbadensis miller",
+                light_requirement="sonnig",
+                water_requirement="wenig",
+                temperature_requirement="warm",
+                humidity_requirement="trocken",
+                soil_type="kaktuserde",
+                height_min=20,
+                height_max=60,
+                flower_color="gelb",
+                poisonous=False,
+                flowering_season_start=5,
+                flowering_season_end=7
+            ),
+            PlantCatalog(
+                name="Zamioculcas",
+                botanical_name="Zamioculcas zamiifolia",
+                light_requirement="schatten",
+                water_requirement="wenig",
+                temperature_requirement="normal",
+                humidity_requirement="trocken",
+                soil_type="durchlaessig",
+                height_min=40,
+                height_max=100,
+                flower_color="grün",
+                poisonous=True,
+                flowering_season_start=4,
+                flowering_season_end=6
+            ),
+            PlantCatalog(
+                name="Orchidee",
+                botanical_name="Phalaenopsis",
+                light_requirement="halbschatten",
+                water_requirement="mittel",
+                temperature_requirement="warm",
+                humidity_requirement="feucht",
+                soil_type="orchideensubstrat",
+                height_min=20,
+                height_max=70,
+                flower_color="rosa",
+                poisonous=False,
+                flowering_season_start=1,
+                flowering_season_end=12
+            )
+        ]
+
+        db.session.add_all(example_plants)
+        db.session.commit()
+
+        print("Beispiel-Pflanzen angelegt")
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Fehler beim Anlegen der Beispiel-Pflanzen: {e}")
+
 def require_login():
     '''
-    Prüft, ob User eingeloggt. Wenn nicht: JSON-Fehlermeldung
+    Prüft, ob User eingeloggt
     '''
     user_id = session.get('user_id')
     if not user_id:
