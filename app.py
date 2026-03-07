@@ -531,6 +531,26 @@ def list_plants_by_location(location_id):
         for p in plants
     ]), 200
 
+@app.route('/api/plants/<int:plant_id>/check-location/<int:location_id>', methods=['GET'])
+def check_plant_for_location(plant_id, location_id):
+    '''
+    Prüft ob Pflanze zu Standort passt
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
+
+    plant = Plant.query.filter_by(id=plant_id, user_id=user_id).first()
+    if not plant:
+        return jsonify({"error": "Pflanze nicht gefunden"}), 404
+
+    location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    if not location:
+        return jsonify({"error": "Standort nicht gefunden"}), 404
+
+    result = check_plant_location_suitability(plant, location)
+    return jsonify(result), 200
+
 @app.route('/api/inventory', methods=['GET'])
 def list_inventory():
     '''
