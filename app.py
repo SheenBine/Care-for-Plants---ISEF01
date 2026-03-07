@@ -169,6 +169,60 @@ with app.app_context():
             db.session.rollback()
             print(f"Fehler beim Anlegen der Beispiel-Pflanzen: {e}")
 
+    if Location.query.count() == 0:
+
+        user = User.query.filter_by(username="testuser").first()
+
+        wohnzimmer = Location(
+            user_id=user.id,
+            name="Wohnzimmer",
+            lighting_condition="halbschatten",
+            temperature="normal",
+            humidity="normal"
+        )
+
+        schlafzimmer = Location(
+            user_id=user.id,
+            name="Schlafzimmer",
+            lighting_condition="schatten",
+            temperature="normal",
+            humidity="trocken"
+        )
+
+        db.session.add_all([wohnzimmer, schlafzimmer])
+        db.session.commit()
+
+    if Plant.query.count() == 0:
+
+        user = User.query.filter_by(username="testuser").first()
+        wohnzimmer = Location.query.filter_by(name="Wohnzimmer").first()
+
+        monstera = Plant(
+            user_id=user.id,
+            name="Monstera",
+            botanical_name="Monstera deliciosa",
+            light_requirement="halbschatten",
+            water_requirement="mittel",
+            temperature_requirement="normal",
+            humidity_requirement="normal",
+            is_purchased=True,
+            location_id=wohnzimmer.id
+        )
+
+        ficus = Plant(
+            user_id=user.id,
+            name="Ficus",
+            botanical_name="Ficus elastica",
+            light_requirement="halbschatten",
+            water_requirement="mittel",
+            temperature_requirement="normal",
+            humidity_requirement="normal",
+            is_purchased=False
+        )
+
+        db.session.add_all([monstera, ficus])
+        db.session.commit()
+
 def require_login():
     '''
     Prüft, ob User eingeloggt
