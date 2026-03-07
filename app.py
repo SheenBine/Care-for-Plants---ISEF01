@@ -852,6 +852,98 @@ def suggest_locations_for_plant(plant_id):
 
     return jsonify(filtered_results), 200
 
+# Pflanzenempfehlungen für einen Standort
+
+@app.route('/api/locations/<int:location_id>/recommend-plants', methods=['GET'])
+def recommend_plants_for_location(location_id):
+    '''
+    Empfiehlt Pflanzen aus dem PlantCatalog für einen Standort
+    Kriterien:
+    - Standortanforderungen müssen passen
+    - bereits vorhandene Pflanzen des Users nicht doppelt vorschlagen
+    - ästhetische Vielfalt leicht bevorzugen
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
+
+    # Standort prüfen
+    location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    if not location:
+        return jsonify({"error": "Standort nicht gefunden"}), 404
+
+    # Bereits vorhandene Bestands-Pflanzen des Users holen
+    inventory_plants = Plant.query.filter_by(user_id=user_id, is_purchased=True).all()
+
+    # Bereits vorhandene Pflanzen an genau diesem Standort holen
+    inventory_plants_at_location = Plant.query.filter_by(
+        user_id=user_id,
+        is_purchased=True,
+        location_id=location_id
+    ).all()
+
+    # Vorhandene Pflanzen-Identitäten zum Ausschließen sammeln
+    owned_plant_keys = {get_plant_identity(p) for p in inventory_plants}
+
+    # Alle Pflanzen aus dem Katalog holen
+    catalog_plants = PlantCatalog.query.order_by(PlantCatalog.name.asc()).all()
+
+    recommendations = []
+
+    for catalog_plant in catalog_plants:
+        # Keine Pflanzen empfehlen, die der User schon im Bestand hat
+        if get_plant_identity(catalog_plant) in owned_plant_keys:
+            continue
+
+        # Standortprüfung mit vorhandener Logik
+        suitability_result = check_plant_location_suitability(catalog_plant, location)
+
+        # Nur geeignete oder bedingt geeignete Pflanzen vorschlagen
+        if suitability_result["suitability"] not in ["geeignet", "bedingt geeignet"]:
+            continue
+
+        # Kleine ästhetische Bonuslogik
+        aesthetic_bonus, aesthetic_reasons = calculate_aesthetic_bonus(
+            catalog_plant,
+            inventory_plants_at_location
+        )
+
+        recommendations.append({
+            "id": catalog_plant.id,
+            "name": catalog_plant.name,
+            "botanical_name": catalog_plant.botanical_name,
+            "suitability": suitability_result["suitability"],
+            "checks": suitability_result["checks"],
+            "flower_color": catalog_plant.flower_color,
+            "height_min": catalog_plant.height_min,
+            "height_max": catalog_plant.height_max,
+            "aesthetic_bonus": aesthetic_bonus,
+            "aesthetic_reasons": aesthetic_reasons
+        })
+
+    # Sortierung:
+    # geeignet vor bedingt geeignet
+    # höherer ästhetischer Bonus zuerst
+    # alphabetisch
+    suitability_order = {
+        "geeignet": 0,
+        "bedingt geeignet": 1
+    }
+
+    recommendations.sort(
+        key=lambda r: (
+            suitability_order.get(r["suitability"], 99),
+            -r["aesthetic_bonus"],
+            r["name"].lower()
+        )
+    )
+
+    return jsonify({
+        "location_id": location.id,
+        "location_name": location.name,
+        "recommendations": recommendations
+    }), 200
+
 @app.route('/api/inventory', methods=['GET'])
 def list_inventory():
     '''
