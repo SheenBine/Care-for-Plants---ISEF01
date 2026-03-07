@@ -299,6 +299,20 @@ def location_plants_page(location_id):
     )
 
 
+@app.route('/pflanzen', methods=['GET'])
+def plants_overview_page():
+    '''
+    HTML-Seite für die Gesamtübersicht aller Pflanzen anzeigen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    return render_template(
+        'liste_von_pflanzen.html',
+        username=session['username']
+    )
+
+
 @app.route('/new_plant', methods=['GET'])
 def new_plant_page():
     '''
@@ -632,6 +646,50 @@ def list_inventory():
         for p in plants
     ]), 200
 
+@app.route('/api/plants', methods=['GET'])
+def list_all_plants():
+    '''
+    Gibt eine Gesamtliste aller Pflanzen des eingeloggten Users zurück
+    Enthält Wunschliste und Bestand
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
+
+    plants = Plant.query.filter_by(user_id=user_id).order_by(Plant.created_at.desc()).all()
+
+    result = []
+    for p in plants:
+        location_name = None
+
+        if p.location_id is not None:
+            location = Location.query.filter_by(id=p.location_id, user_id=user_id).first()
+            if location:
+                location_name = location.name
+
+        result.append({
+            "id": p.id,
+            "name": p.name,
+            "botanical_name": p.botanical_name,
+            "is_purchased": bool(p.is_purchased),
+            "location_id": p.location_id,
+            "location_name": location_name,
+            "light_requirement": p.light_requirement,
+            "water_requirement": p.water_requirement,
+            "temperature_requirement": p.temperature_requirement,
+            "humidity_requirement": p.humidity_requirement,
+            "soil_type": p.soil_type,
+            "height_min": p.height_min,
+            "height_max": p.height_max,
+            "poisonous": bool(p.poisonous),
+            "flowering_season_start": p.flowering_season_start,
+            "flowering_season_end": p.flowering_season_end,
+            "flower_color": p.flower_color,
+            "notes": p.notes,
+            "created_at": str(p.created_at)
+        })
+
+    return jsonify(result), 200
 
 @app.route('/api/inventory', methods=['POST'])
 def add_inventory_item():
