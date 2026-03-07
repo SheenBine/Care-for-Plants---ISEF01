@@ -85,9 +85,11 @@ CREATE TABLE IF NOT EXISTS plant_catalog (
 );
 
 -- Indizes für Performance
+CREATE INDEX IF NOT EXISTS idx_locations_user ON locations(user_id);
+
+CREATE INDEX IF NOT EXISTS idx_plants_user ON plants(user_id);
 CREATE INDEX IF NOT EXISTS idx_plants_location ON plants(location_id);
 CREATE INDEX IF NOT EXISTS idx_plants_purchased ON plants(is_purchased);
-CREATE INDEX IF NOT EXISTS idx_locations_user ON locations(user_id);
-CREATE INDEX IF NOT EXISTS idx_plants_user ON plants(user_id);
-CREATE INDEX IF NOT EXISTS idx_recommendations_user ON recommendations(user_id);
-CREATE INDEX IF NOT EXISTS idx_recommendations_location ON recommendations(location_id);
+
+CREATE INDEX IF NOT EXISTS idx_plant_catalog_name ON plant_catalog(name);
+CREATE INDEX IF NOT EXISTS idx_plant_catalog_botanical_name ON plant_catalog(botanical_name);
