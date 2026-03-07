@@ -1,6 +1,3 @@
--- Datenbankschema 
-
--- Tabelle für Benutzer
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL UNIQUE,
@@ -9,7 +6,6 @@ CREATE TABLE IF NOT EXISTS users (
     last_login TIMESTAMP
 );
 
--- Tabelle für Standorte
 CREATE TABLE IF NOT EXISTS locations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -23,14 +19,12 @@ CREATE TABLE IF NOT EXISTS locations (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Tabelle für Pflanzen
 CREATE TABLE IF NOT EXISTS plants (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     botanical_name TEXT,
 
-    -- Standortanforderungen
     light_requirement TEXT CHECK(light_requirement IN ('schatten', 'halbschatten', 'sonnig')),
     water_requirement TEXT CHECK(water_requirement IN ('wenig', 'mittel', 'viel')),
     temperature_min INTEGER,
@@ -38,7 +32,6 @@ CREATE TABLE IF NOT EXISTS plants (
     humidity_requirement TEXT CHECK(humidity_requirement IN ('trocken', 'normal', 'feucht')),
     soil_type TEXT,
 
-    -- Eigenschaften
     height_min INTEGER, 
     height_max INTEGER, 
     poisonous BOOLEAN DEFAULT 0,
@@ -46,7 +39,6 @@ CREATE TABLE IF NOT EXISTS plants (
     flowering_season_end INTEGER,   
     flower_color TEXT,
 
-    -- Status
     is_purchased BOOLEAN DEFAULT 0,
     location_id INTEGER,
     notes TEXT,
@@ -68,6 +60,28 @@ CREATE TABLE IF NOT EXISTS recommendations (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE,
     FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS plant_catalog (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    name TEXT NOT NULL,
+    botanical_name TEXT,
+
+    light_requirement TEXT CHECK(light_requirement IN ('schatten', 'halbschatten', 'sonnig')),
+    water_requirement TEXT CHECK(water_requirement IN ('wenig', 'mittel', 'viel')),
+    temperature_requirement TEXT CHECK(temperature_requirement IN ('kalt', 'normal', 'warm')),
+    humidity_requirement TEXT CHECK(humidity_requirement IN ('trocken', 'normal', 'feucht')),
+    soil_type TEXT,
+
+    height_min INTEGER,
+    height_max INTEGER,
+    flower_color TEXT,
+    poisonous BOOLEAN DEFAULT 0,
+    flowering_season_start INTEGER CHECK(flowering_season_start BETWEEN 1 AND 12),
+    flowering_season_end INTEGER CHECK(flowering_season_end BETWEEN 1 AND 12),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Indizes für Performance
