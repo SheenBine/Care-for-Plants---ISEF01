@@ -284,6 +284,19 @@ def locations_page():
     return render_template('standorte.html', username=session['username'])
 
 
+@app.route('/plants', methods=['GET'])
+def plants_page():
+    '''
+    HTML-Seite für die Gesamtübersicht aller Pflanzen anzeigen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    return render_template(
+        'liste_von_pflanzen.html',
+        username=session['username']
+    )
+
 @app.route('/locations/<int:location_id>/plants', methods=['GET'])
 def location_plants_page(location_id):
     '''
@@ -296,20 +309,6 @@ def location_plants_page(location_id):
         'liste_von_pflanzen.html',
         username=session['username'],
         location_id=location_id
-    )
-
-
-@app.route('/pflanzen', methods=['GET'])
-def plants_overview_page():
-    '''
-    HTML-Seite für die Gesamtübersicht aller Pflanzen anzeigen
-    '''
-    if 'username' not in session:
-        return redirect(url_for('auth'))
-
-    return render_template(
-        'liste_von_pflanzen.html',
-        username=session['username']
     )
 
 
