@@ -70,56 +70,113 @@ def validate_enum(field_name, value, allowed_values):
 
     return True, None
 
-# Eignungsprüfung
+# 3-stufige Eignungsprüfung mit geeignet/bedingt geeignet/ungeeignet
+def compare_enum_values(plant_value, location_value, ordered_values):
+    '''
+    Vergleicht Enum-Werte
+    - "match" --> exakt passend
+    - "close" --> nur eine Stufe Unterschied
+    - "mismatch" --> mehr als eine Stufe Unterschied oder nicht vergleichbar
+    '''
+    if not plant_value or not location_value:
+        return "unknown"
+
+    if plant_value not in ordered_values or location_value not in ordered_values:
+        return "unknown"
+
+    plant_index = ordered_values.index(plant_value)
+    location_index = ordered_values.index(location_value)
+
+    difference = abs(plant_index - location_index)
+
+    if difference == 0:
+        return "match"
+    elif difference == 1:
+        return "close"
+    else:
+        return "mismatch"
+
+
 def check_plant_location_suitability(plant, location):
     '''
-    Prüft ob eine Pflanze zu einem Standort passt
-    Verglichen werden:
+    Prüft, ob eine Pflanze zu einem Standort passt
+    Bewertung:
+    - geeignet
+    - bedingt geeignet
+    - ungeeignet
+
+    Grundlage:
     - Licht
     - Temperatur
     - Luftfeuchte
     '''
     checks = []
 
+    # Reihenfolge der Enum-Werte
+    light_scale = ["schatten", "halbschatten", "sonnig"]
+    temp_scale = ["kalt", "normal", "warm"]
+    humidity_scale = ["trocken", "normal", "feucht"]
+
     # Licht prüfen
     if plant.light_requirement:
-        light_match = plant.light_requirement == location.lighting_condition
+        result = compare_enum_values(
+            plant.light_requirement,
+            location.lighting_condition,
+            light_scale
+        )
         checks.append({
             "criterion": "light",
             "plant_value": plant.light_requirement,
             "location_value": location.lighting_condition,
-            "matches": light_match
+            "result": result
         })
 
     # Temperatur prüfen
     if plant.temperature_requirement:
-        temp_match = plant.temperature_requirement == location.temperature
+        result = compare_enum_values(
+            plant.temperature_requirement,
+            location.temperature,
+            temp_scale
+        )
         checks.append({
             "criterion": "temperature",
             "plant_value": plant.temperature_requirement,
             "location_value": location.temperature,
-            "matches": temp_match
+            "result": result
         })
 
     # Luftfeuchte prüfen
     if plant.humidity_requirement:
-        humidity_match = plant.humidity_requirement == location.humidity
+        result = compare_enum_values(
+            plant.humidity_requirement,
+            location.humidity,
+            humidity_scale
+        )
         checks.append({
             "criterion": "humidity",
             "plant_value": plant.humidity_requirement,
             "location_value": location.humidity,
-            "matches": humidity_match
+            "result": result
         })
 
-    # geeignet = alle vorhandenen Prüfungen stimmen
-    suitable = all(check["matches"] for check in checks) if checks else True
+    # Gesamtbewertung bestimmen
+    match_count = sum(1 for check in checks if check["result"] == "match")
+    close_count = sum(1 for check in checks if check["result"] == "close")
+    mismatch_count = sum(1 for check in checks if check["result"] == "mismatch")
+
+    if mismatch_count == 0 and close_count == 0:
+        suitability = "geeignet"
+    elif mismatch_count == 0 and close_count > 0:
+        suitability = "bedingt geeignet"
+    else:
+        suitability = "ungeeignet"
 
     return {
         "plant_id": plant.id,
         "plant_name": plant.name,
         "location_id": location.id,
         "location_name": location.name,
-        "suitable": suitable,
+        "suitability": suitability,
         "checks": checks
     }
 
