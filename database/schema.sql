@@ -1,9 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_login TIMESTAMP
+    password_hash TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS locations (
@@ -27,16 +25,15 @@ CREATE TABLE IF NOT EXISTS plants (
 
     light_requirement TEXT CHECK(light_requirement IN ('schatten', 'halbschatten', 'sonnig')),
     water_requirement TEXT CHECK(water_requirement IN ('wenig', 'mittel', 'viel')),
-    temperature_min INTEGER,
-    temperature_max INTEGER,
+    temperature_requirement TEXT CHECK(temperature_requirement IN ('kalt', 'normal', 'warm')),
     humidity_requirement TEXT CHECK(humidity_requirement IN ('trocken', 'normal', 'feucht')),
     soil_type TEXT,
 
-    height_min INTEGER, 
-    height_max INTEGER, 
+    height_min INTEGER,
+    height_max INTEGER,
     poisonous BOOLEAN DEFAULT 0,
-    flowering_season_start INTEGER, 
-    flowering_season_end INTEGER,   
+    flowering_season_start INTEGER CHECK(flowering_season_start BETWEEN 1 AND 12),
+    flowering_season_end INTEGER CHECK(flowering_season_end BETWEEN 1 AND 12),
     flower_color TEXT,
 
     is_purchased BOOLEAN DEFAULT 0,
@@ -46,20 +43,6 @@ CREATE TABLE IF NOT EXISTS plants (
 
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE SET NULL
-);
-
-CREATE TABLE IF NOT EXISTS recommendations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    plant_id INTEGER NOT NULL,
-    location_id INTEGER NOT NULL,
-    score REAL,
-    reason TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE,
-    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS plant_catalog (
@@ -84,7 +67,6 @@ CREATE TABLE IF NOT EXISTS plant_catalog (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Indizes für Performance
 CREATE INDEX IF NOT EXISTS idx_locations_user ON locations(user_id);
 
 CREATE INDEX IF NOT EXISTS idx_plants_user ON plants(user_id);
