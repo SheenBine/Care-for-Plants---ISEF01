@@ -315,6 +315,69 @@ def check_plant_location_suitability(plant, location):
         "checks": checks
     }
 
+# Pflanzenempfehlungen
+def get_plant_identity(plant):
+    '''
+    Eindeutige Pflanzen-Identität zum Vergleich
+    '''
+    if getattr(plant, "botanical_name", None):
+        return plant.botanical_name.strip().lower()
+    return plant.name.strip().lower()
+
+
+def get_height_mid(plant):
+    '''
+    Berechnet einen ungefähren Mittelwert der Pflanzenhöhe
+    '''
+    if plant.height_min is not None and plant.height_max is not None:
+        return (plant.height_min + plant.height_max) / 2
+    if plant.height_min is not None:
+        return plant.height_min
+    if plant.height_max is not None:
+        return plant.height_max
+    return None
+
+
+def calculate_aesthetic_bonus(candidate, existing_plants_at_location):
+    '''
+    Vergibt kleine Bonuspunkte für ästhetische Vielfalt
+    - andere Blütenfarbe als vorhandene Pflanzen = +1
+    - deutlich andere Höhe als vorhandene Pflanzen = +1
+    '''
+    bonus = 0
+    reasons = []
+
+    # Blütenfarben der vorhandenen Pflanzen sammeln
+    existing_colors = {
+        p.flower_color.strip().lower()
+        for p in existing_plants_at_location
+        if p.flower_color
+    }
+
+    if candidate.flower_color:
+        candidate_color = candidate.flower_color.strip().lower()
+        if existing_colors and candidate_color not in existing_colors:
+            bonus += 1
+            reasons.append("abweichende_blütenfarbe")
+
+    # Durchschnittliche Höhe der vorhandenen Pflanzen vergleichen
+    existing_heights = [
+        get_height_mid(p)
+        for p in existing_plants_at_location
+        if get_height_mid(p) is not None
+    ]
+    candidate_height = get_height_mid(candidate)
+
+    if existing_heights and candidate_height is not None:
+        avg_existing_height = sum(existing_heights) / len(existing_heights)
+
+        # Regel: ab 30 cm Unterschied gilt als variabel
+        if abs(candidate_height - avg_existing_height) >= 30:
+            bonus += 1
+            reasons.append("abweichende_pflanzenhöhe")
+
+    return bonus, reasons
+
 # Routen
 @app.route('/')
 def home():
