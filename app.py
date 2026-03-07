@@ -621,6 +621,39 @@ def check_plant_for_location(plant_id, location_id):
     result = check_plant_location_suitability(plant, location)
     return jsonify(result), 200
 
+# Geeignete Standorte für eine Wunschlisten-Pflanze vorschlagen
+@app.route('/api/plants/<int:plant_id>/suggest-locations', methods=['GET'])
+def suggest_locations_for_plant(plant_id):
+    '''
+    Schlägt für eine Pflanze aus der Wunschliste geeignete Standorte vor.
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
+
+    plant = Plant.query.filter_by(id=plant_id, user_id=user_id, is_purchased=False).first()
+    if not plant:
+        return jsonify({"error": "Pflanze aus Wunschliste nicht gefunden"}), 404
+
+    locations = Location.query.filter_by(user_id=user_id).order_by(Location.created_at.desc()).all()
+
+    results = []
+    for location in locations:
+        result = check_plant_location_suitability(plant, location)
+        results.append(result)
+
+    # Nur geeignete oder bedingt geeignete Standorte zurückgeben
+    filtered_results = [
+        r for r in results
+        if r["suitability"] in ["geeignet", "bedingt geeignet"]
+    ]
+
+    # Geeignet vor bedingt geeignet sortieren
+    order = {"geeignet": 0, "bedingt geeignet": 1}
+    filtered_results.sort(key=lambda r: order.get(r["suitability"], 99))
+
+    return jsonify(filtered_results), 200
+
 @app.route('/api/inventory', methods=['GET'])
 def list_inventory():
     '''
