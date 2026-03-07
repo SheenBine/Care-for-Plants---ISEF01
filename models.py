@@ -89,3 +89,30 @@ class Plant(db.Model):
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id', ondelete="SET NULL"), nullable=True)
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+
+class PlantCatalog(db.Model):
+    '''
+    Pflanzenkatalog für Empfehlungen
+    '''
+    __tablename__ = "plant_catalog"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String(120), nullable=False)
+    botanical_name = db.Column(db.String(200))
+
+    light_requirement = db.Column(db.String(20))        
+    water_requirement = db.Column(db.String(20))        
+    temperature_requirement = db.Column(db.String(20))  
+    humidity_requirement = db.Column(db.String(20))     
+    soil_type = db.Column(db.String(120))
+
+    height_min = db.Column(db.Integer)
+    height_max = db.Column(db.Integer)
+    flower_color = db.Column(db.String(80))
+    poisonous = db.Column(db.Boolean, default=False)
+
+    flowering_season_start = db.Column(db.Integer)
+    flowering_season_end = db.Column(db.Integer)
+
+    created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
