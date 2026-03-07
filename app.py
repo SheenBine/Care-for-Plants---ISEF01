@@ -70,6 +70,59 @@ def validate_enum(field_name, value, allowed_values):
 
     return True, None
 
+# Eignungsprüfung
+def check_plant_location_suitability(plant, location):
+    '''
+    Prüft ob eine Pflanze zu einem Standort passt
+    Verglichen werden:
+    - Licht
+    - Temperatur
+    - Luftfeuchte
+    '''
+    checks = []
+
+    # Licht prüfen
+    if plant.light_requirement:
+        light_match = plant.light_requirement == location.lighting_condition
+        checks.append({
+            "criterion": "light",
+            "plant_value": plant.light_requirement,
+            "location_value": location.lighting_condition,
+            "matches": light_match
+        })
+
+    # Temperatur prüfen
+    if plant.temperature_requirement:
+        temp_match = plant.temperature_requirement == location.temperature
+        checks.append({
+            "criterion": "temperature",
+            "plant_value": plant.temperature_requirement,
+            "location_value": location.temperature,
+            "matches": temp_match
+        })
+
+    # Luftfeuchte prüfen
+    if plant.humidity_requirement:
+        humidity_match = plant.humidity_requirement == location.humidity
+        checks.append({
+            "criterion": "humidity",
+            "plant_value": plant.humidity_requirement,
+            "location_value": location.humidity,
+            "matches": humidity_match
+        })
+
+    # geeignet = alle vorhandenen Prüfungen stimmen
+    suitable = all(check["matches"] for check in checks) if checks else True
+
+    return {
+        "plant_id": plant.id,
+        "plant_name": plant.name,
+        "location_id": location.id,
+        "location_name": location.name,
+        "suitable": suitable,
+        "checks": checks
+    }
+
 # Routen
 @app.route('/')
 def home():
