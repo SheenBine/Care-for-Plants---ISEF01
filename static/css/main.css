@@ -195,6 +195,8 @@ body {
 
 .col-4{width: 66.666%;}
 
+.col-6{width: 100%;}
+
 @media (max-width: 768px){
     .col-2{width: 100%;}
     .col-4{width: 100%;}

@@ -29,24 +29,40 @@
         </header>
 
                     <!-- Content Bereich -->
+                    <div class="continer">
+            <div class="row">
+                <!-- Tabelle mit Pflanzen -->
+                <div class="col-6">
+                    {% if locations|length < 1 %}
+                        <h4 style="text-align: center">Es gibt noch keine Standorte</h4>
+                    {% else %}
                     <table>
                         <tr>
-                            <th>1</th>
-                            <th>2</th>
-                            <th>2</th>
+                            <th>Name</th>
+                            <th>Lichtverhältnisse</th>
+                            <th>Temperatur</th>
+                            <th>Luftfeuchtigkeit</th>
+                            <th>Beschreibung</th>
+                            <th>Änderungen</th>
                         </tr>
-                        <!-- {% for standort in standorten %} -->
+                        {% for loc in locations %}
                         <tr>
-                            <td><!--{{ standort.1 }}--></td>
-                            <td><!--{{ standort.2 }}--></td>
+                            <td>{{ loc.name }}</td>
+                            <td>{{ loc.lighting_condition }}</td>
+                            <td>{{ loc.temperature }}</td>
+                            <td>{{ loc.humidity }}</td>
+                            <td>{{ loc.description }}</td>
                             <td>
-                                <!-- <a href="/delete/{{standort.id}}">Löschen</a>-->
-                                <br>
-                                <!-- <a href="/update/{{standort.id}}">Update</a>-->
+                                <!-- <a href="/auf_wunschliste/{{pflanze.id}}">Zur Wunschliste hinzufügen</a>-->
                             </td>
                         </tr>
-                        <!-- {% endfor %}-->
+                        {% endfor %}
                     </table>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
 
 
 
