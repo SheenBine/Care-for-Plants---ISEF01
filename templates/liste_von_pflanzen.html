@@ -38,22 +38,50 @@
                 </div>
                 <!-- Tabelle mit Pflanzen -->
                 <div class="col-4">
+                    {% if plants|length < 1 %}
+                        <h4 style="text-align: center">Es gibt noch keine Pflanzen</h4>
+                    {% else %}
                     <table>
                         <tr>
-                            <th>1</th>
-                            <th>2</th>
-                            <th>2</th>
+                            <th>Name</th>
+                            <th>Botanischer Name</th>
+                            <th>Benötigtes Licht</th>
+                            <th>Benötigtes Wasser</th>
+                            <th>Benötigte Temperatur</th>
+                            <th>Benötigte Feuchtigkeit</th>
+                            <th>Bodenart</th>
+                            <th>Minimale Höhe</th>
+                            <th>Maximale Höhe</th>
+                            <th>Giftig?</th>
+                            <th>Blüte Anfang</th>
+                            <th>Büte Ende</th>
+                            <th>Pflanzenfarbe</th>
+                            <th>Notizen</th>
+                            <th>Pflanze Anpassen</th>
                         </tr>
-                        <!-- {% for pflanze in pflanzen %} -->
+                        {% for p in plants %}
                         <tr>
-                            <td><!--{{ pflanze.1 }}--></td>
-                            <td><!--{{ pflanze.2 }}--></td>
+                            <td>{{ p.name }}</td>
+                            <td>{{ p.botanical_name }}</td>
+                            <td>{{ p.light_requirement }}</td>
+                            <td>{{ p.water_requirement }}</td>
+                            <td>{{ p.temperature_requirement }}</td>
+                            <td>{{ p.humidity_requirement }}</td>
+                            <td>{{ p.soil_type }}</td>
+                            <td>{{ p.height_min }}</td>
+                            <td>{{ p.height_max }}</td>
+                            <td>{{ p.poisonous }}</td>
+                            <td>{{ p.flowering_season_start }}</td>
+                            <td>{{ p.flowering_season_end }}</td>
+                            <td>{{ p.flower_color }}</td>
+                            <td>{{ p.notes }}</td>
                             <td>
                                 <!-- <a href="/auf_wunschliste/{{pflanze.id}}">Zur Wunschliste hinzufügen</a>-->
                             </td>
                         </tr>
-                        <!-- {% endfor %}-->
+                        {% endfor %}
                     </table>
+                    {% endif %}
 
                 </div>
             </div>
