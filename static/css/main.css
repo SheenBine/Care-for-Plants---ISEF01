@@ -137,7 +137,7 @@ body {
 }
 
 .manue > ul > li > a {
-    margin-top: .5rem;
+    margin-top: .1rem;
     display: inline-block;
     border: 2px solid black;
     text-align: center;
