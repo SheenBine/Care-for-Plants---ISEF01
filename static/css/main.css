@@ -202,5 +202,13 @@ body {
     .col-4{width: 100%;}
 }
 
+    /*Buttons location*/
+
+.location_button{
+    margin-top: .9rem;
+    height:50px;
+    min-width:400px;
+    font-size: 2em;
+}
 
 

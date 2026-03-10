@@ -15,6 +15,7 @@
             <!-- Content -->
             <div>
                 <h1>Care for Plants</h1>
+                <h2>Empflehlungen</h2>
             </div>
 
             <!-- Navigation -->
@@ -33,7 +34,9 @@
             <div class="row">
                 <!-- Standort Buttons -->
                 <div class="col-2">
-                    <button type="submit" name="action" value="Alle Pflanzen">Alle Pflanzen</button>
+                    <a href="/plants">
+                        <button class="location_button">Alle Pflanzen</button>
+                    </a>
                     {% for location in locations %}
                     <br>
                     <button type="submit" name="action" value="{{ location.id }}">{{ location.name }}</button>
