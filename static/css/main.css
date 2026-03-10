@@ -211,8 +211,31 @@ body {
     font-size: 2em;
 }
 
-    /*Pflanzen Tabellen*/
+    /*Tabellen*/
 
-.pf_tabelle {
-    font-size: 1rem;
+table, th {
+  border: thin solid gainsboro;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-width: thin 0 0 thin;
+  margin: 0 0 1em;
+  table-layout: auto;
+  max-width: 100%;
+}
+th {
+  font-weight: 700;
+  padding: .2em .5em;
+  border-radius: .1em; 
+}
+
+tbody tr:nth-child(even) { 
+  background-color: #e4ebf2; 
+}
+
+thead th {
+  background-color: #d2d2d2;
+  color: #000000;
 }
