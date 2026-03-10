@@ -35,7 +35,10 @@
                 <!-- Standort Buttons -->
                 <div class="col-2">
                     <button type="submit" name="action" value="Alle Pflanzen">Alle Pflanzen</button>
-
+                    {% for location in locations %}
+                    <br>
+                    <button type="submit" name="action" value="{{ location.id }}">{{ location.name }}</button>
+                    {% endfor %}
                 </div>
                 <!-- Tabelle mit Pflanzen -->
                 <div class="col-4">
