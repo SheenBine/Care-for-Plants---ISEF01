@@ -1134,10 +1134,12 @@ def list_inventory():
 @app.route('/api/plants', methods=['GET'])
 def list_all_plants():
     '''
-    Kombinierte Gesamtübersicht:
+    ALT: Kombinierte Gesamtübersicht:
     - Wunschliste
     - Bestand
     - Empfehlungen aus PlantCatalog
+
+    Wird aktuell NICHT vom Frontend verwendet
     '''
     user_id, err = require_login()
     if err:
