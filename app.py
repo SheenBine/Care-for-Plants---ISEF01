@@ -612,8 +612,13 @@ def list_wishlist():
     user_id, err = require_login()
     if err:
         return err
+    
+    location_id = request.args.get("location_id", type=int)
 
-    plants = Plant.query.filter_by(user_id=user_id, is_purchased=False).order_by(Plant.created_at.desc()).all()
+    if location_id is not None:
+        query = query.filter_by(location_id=location_id)
+
+    plants = query.order_by(Plant.created_at.desc()).all()
 
     return jsonify([
         {
@@ -632,6 +637,8 @@ def list_wishlist():
             "flowering_season_end": p.flowering_season_end,
             "flower_color": p.flower_color,
             "notes": p.notes,
+            "location_id": p.location_id,
+            "source": "wishlist",
             "created_at": str(p.created_at)
         }
         for p in plants
