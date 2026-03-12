@@ -1130,6 +1130,7 @@ def list_inventory():
         for p in plants
     ]), 200
 
+# ACHTUNG: VORERST DIESE ROUTE NICHT MEHR VERWENDEN!!! STATTDESSEN /api/recommendations
 @app.route('/api/plants', methods=['GET'])
 def list_all_plants():
     '''
