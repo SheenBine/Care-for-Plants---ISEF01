@@ -1121,7 +1121,7 @@ def list_inventory():
     query = Plant.query.filter_by(user_id=user_id, is_purchased=True)
 
     if location_id is not None:
-        query = query.filter_by(location_id=location_id)
+        query = query.filter_by(location_id=location_id)  
 
     plants = query.order_by(Plant.created_at.desc()).all()  
 
