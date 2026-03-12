@@ -1019,6 +1019,13 @@ def list_inventory():
     if err:
         return err
 
+    location_id = request.args.get("location_id", type=int)
+
+    query = Plant.query.filter_by(user_id=user_id, is_purchased=True)
+
+    if location_id is not None:
+        query = query.filter_by(location_id=location_id)
+
     plants = Plant.query.filter_by(user_id=user_id, is_purchased=True).order_by(Plant.created_at.desc()).all()
 
     return jsonify([
@@ -1028,6 +1035,7 @@ def list_inventory():
             "botanical_name": p.botanical_name,
             "location_id": p.location_id,
             "notes": p.notes,
+            "source": "inventory",
             "created_at": str(p.created_at)
         }
         for p in plants
@@ -1036,17 +1044,34 @@ def list_inventory():
 @app.route('/api/plants', methods=['GET'])
 def list_all_plants():
     '''
-    Gibt eine Gesamtliste aller Pflanzen des eingeloggten Users zurück
-    Enthält Wunschliste und Bestand
+    Kombinierte Gesamtübersicht:
+    - Wunschliste
+    - Bestand
+    - Empfehlungen aus PlantCatalog
     '''
     user_id, err = require_login()
     if err:
         return err
 
-    plants = Plant.query.filter_by(user_id=user_id).order_by(Plant.created_at.desc()).all()
+    location_id = request.args.get("location_id", type=int)
+
+    selected_location = None
+    if location_id is not None:
+        selected_location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+        if not selected_location:
+            return jsonify({"error": "Standort nicht gefunden"}), 404
+
+    # 1. User-Pflanzen laden
+    user_query = Plant.query.filter_by(user_id=user_id)
+
+    if location_id is not None:
+        user_query = user_query.filter_by(location_id=location_id)
+
+    user_plants = user_query.order_by(Plant.created_at.desc()).all()
 
     result = []
-    for p in plants:
+
+    for p in user_plants:
         location_name = None
 
         if p.location_id is not None:
@@ -1073,8 +1098,108 @@ def list_all_plants():
             "flowering_season_end": p.flowering_season_end,
             "flower_color": p.flower_color,
             "notes": p.notes,
-            "created_at": str(p.created_at)
+            "created_at": str(p.created_at),
+            "source": "inventory" if p.is_purchased else "wishlist"
         })
+
+    # 2. Bereits vorhandene Pflanzen ausschließen
+    #    (Wunschliste + Bestand)
+    all_owned_plants = Plant.query.filter_by(user_id=user_id).all()
+    owned_plant_keys = {get_plant_identity(p) for p in all_owned_plants}
+
+    # Bereits vorhandene Bestands-Pflanzen für ästhetischen Vergleich
+    inventory_plants = Plant.query.filter_by(user_id=user_id, is_purchased=True).all()
+
+    if selected_location is not None:
+        inventory_plants_at_location = Plant.query.filter_by(
+            user_id=user_id,
+            is_purchased=True,
+            location_id=location_id
+        ).all()
+    else:
+        inventory_plants_at_location = inventory_plants
+
+    # 3. Empfehlungen aus PlantCatalog
+    catalog_plants = PlantCatalog.query.order_by(PlantCatalog.name.asc()).all()
+
+    recommendation_items = []
+
+    for catalog_plant in catalog_plants:
+        # Keine Pflanze empfehlen, die schon vorhanden ist
+        if get_plant_identity(catalog_plant) in owned_plant_keys:
+            continue
+
+        suitability = None
+        suitability_checks = []
+        aesthetic_bonus = 0
+        aesthetic_reasons = []
+
+        # Wenn ein Standort gewählt ist:
+        # nur geeignete oder bedingt geeignete Empfehlungen anzeigen
+        if selected_location is not None:
+            suitability_result = check_plant_location_suitability(catalog_plant, selected_location)
+
+            if suitability_result["suitability"] not in ["geeignet", "bedingt geeignet"]:
+                continue
+
+            suitability = suitability_result["suitability"]
+            suitability_checks = suitability_result["checks"]
+
+            aesthetic_bonus, aesthetic_reasons = calculate_aesthetic_bonus(
+                catalog_plant,
+                inventory_plants_at_location
+            )
+        else:
+            # Ohne Standort: nur allgemeine Empfehlung ohne Standortprüfung
+            aesthetic_bonus, aesthetic_reasons = calculate_aesthetic_bonus(
+                catalog_plant,
+                inventory_plants
+            )
+
+        recommendation_items.append({
+            "id": catalog_plant.id,
+            "name": catalog_plant.name,
+            "botanical_name": catalog_plant.botanical_name,
+            "is_purchased": False,
+            "location_id": location_id if selected_location is not None else None,
+            "location_name": selected_location.name if selected_location is not None else None,
+            "light_requirement": catalog_plant.light_requirement,
+            "water_requirement": catalog_plant.water_requirement,
+            "temperature_requirement": catalog_plant.temperature_requirement,
+            "humidity_requirement": catalog_plant.humidity_requirement,
+            "soil_type": catalog_plant.soil_type,
+            "height_min": catalog_plant.height_min,
+            "height_max": catalog_plant.height_max,
+            "poisonous": bool(catalog_plant.poisonous),
+            "flowering_season_start": catalog_plant.flowering_season_start,
+            "flowering_season_end": catalog_plant.flowering_season_end,
+            "flower_color": catalog_plant.flower_color,
+            "notes": None,
+            "created_at": str(catalog_plant.created_at),
+            "source": "recommendation",
+            "suitability": suitability,
+            "checks": suitability_checks,
+            "aesthetic_bonus": aesthetic_bonus,
+            "aesthetic_reasons": aesthetic_reasons
+        })
+
+    # Empfehlungen sortieren:
+    # geeignet vor bedingt geeignet, dann höherer Bonus, dann alphabetisch
+    suitability_order = {
+        None: 2,
+        "geeignet": 0,
+        "bedingt geeignet": 1
+    }
+
+    recommendation_items.sort(
+        key=lambda r: (
+            suitability_order.get(r["suitability"], 99),
+            -r["aesthetic_bonus"],
+            r["name"].lower()
+        )
+    )
+
+    result.extend(recommendation_items)
 
     return jsonify(result), 200
 
