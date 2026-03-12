@@ -615,12 +615,12 @@ def list_wishlist():
     
     location_id = request.args.get("location_id", type=int)
 
-    query = Plant.query.filter_by(user_id=user_id, is_purchased=False)  # neu
+    query = Plant.query.filter_by(user_id=user_id, is_purchased=False)  
 
     if location_id is not None:
-        query = query.filter_by(location_id=location_id)  # neu
+        query = query.filter_by(location_id=location_id)  
 
-    plants = query.order_by(Plant.created_at.desc()).all()  # neu
+    plants = query.order_by(Plant.created_at.desc()).all()  
 
     return jsonify([
         {
@@ -1010,6 +1010,95 @@ def recommend_plants_for_location(location_id):
         "recommendations": recommendations
     }), 200
 
+@app.route('/api/recommendations', methods=['GET'])  
+def list_recommendations():  
+    '''  
+    Gibt Pflanzen aus dem PlantCatalog zurück,  
+    die noch nicht in Wunschliste oder Bestand des Users vorhanden sind
+    '''  
+    user_id, err = require_login()  
+    if err:  
+        return err  
+
+    location_id = request.args.get("location_id", type=int)  
+
+    selected_location = None  
+    if location_id is not None:  
+        selected_location = Location.query.filter_by(id=location_id, user_id=user_id).first()  
+        if not selected_location:  
+            return jsonify({"error": "Standort nicht gefunden"}), 404  
+
+    all_user_plants = Plant.query.filter_by(user_id=user_id).all()  
+    owned_plant_keys = {get_plant_identity(p) for p in all_user_plants}  
+
+    inventory_plants = Plant.query.filter_by(user_id=user_id, is_purchased=True).all()  
+
+    if selected_location is not None:  
+        inventory_plants_for_bonus = Plant.query.filter_by(  
+            user_id=user_id,  
+            is_purchased=True,  
+            location_id=location_id  
+        ).all()  
+    else:  
+        inventory_plants_for_bonus = inventory_plants  
+
+    catalog_plants = PlantCatalog.query.order_by(PlantCatalog.name.asc()).all()  
+
+    recommendations = []  
+
+    for catalog_plant in catalog_plants:  
+        if get_plant_identity(catalog_plant) in owned_plant_keys:  
+            continue  
+
+        suitability = None  
+        checks = []  
+
+        if selected_location is not None:  
+            suitability_result = check_plant_location_suitability(catalog_plant, selected_location)  
+
+            if suitability_result["suitability"] != "geeignet":  
+                continue  
+
+            suitability = suitability_result["suitability"]  
+            checks = suitability_result["checks"]  
+
+        aesthetic_bonus, aesthetic_reasons = calculate_aesthetic_bonus(  
+            catalog_plant,  
+            inventory_plants_for_bonus  
+        )  
+
+        recommendations.append({  
+            "id": catalog_plant.id,  
+            "name": catalog_plant.name,  
+            "botanical_name": catalog_plant.botanical_name,  
+            "light_requirement": catalog_plant.light_requirement,  
+            "water_requirement": catalog_plant.water_requirement,  
+            "temperature_requirement": catalog_plant.temperature_requirement,  
+            "humidity_requirement": catalog_plant.humidity_requirement,  
+            "soil_type": catalog_plant.soil_type,  
+            "height_min": catalog_plant.height_min,  
+            "height_max": catalog_plant.height_max,  
+            "poisonous": bool(catalog_plant.poisonous),  
+            "flowering_season_start": catalog_plant.flowering_season_start,  
+            "flowering_season_end": catalog_plant.flowering_season_end,  
+            "flower_color": catalog_plant.flower_color,  
+            "location_id": location_id if selected_location is not None else None,  
+            "suitability": suitability,  
+            "checks": checks,  
+            "aesthetic_bonus": aesthetic_bonus,  
+            "aesthetic_reasons": aesthetic_reasons,  
+            "created_at": str(catalog_plant.created_at)  
+        })  
+
+    recommendations.sort(  
+        key=lambda r: (  
+            -r["aesthetic_bonus"],  
+            r["name"].lower()  
+        )  
+    )  
+
+    return jsonify(recommendations), 200  
+
 @app.route('/api/inventory', methods=['GET'])
 def list_inventory():
     '''
@@ -1027,7 +1116,7 @@ def list_inventory():
     if location_id is not None:
         query = query.filter_by(location_id=location_id)
 
-    plants = query.order_by(Plant.created_at.desc()).all()  # neu
+    plants = query.order_by(Plant.created_at.desc()).all()  
 
     return jsonify([
         {
