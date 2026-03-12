@@ -676,6 +676,12 @@ def add_wishlist_item():
     if not ok:
         return err
 
+    location_id = data.get("location_id")
+    if location_id is not None:
+        loc = Location.query.filter_by(id=location_id, user_id=user_id).first()
+        if not loc:
+            return jsonify({"error": "Standort ungültig"}), 400
+
     try:
         plant = Plant(
             user_id=user_id,
@@ -697,10 +703,8 @@ def add_wishlist_item():
 
             notes=data.get("notes"),
 
-            # Wunschliste = nicht gekauft
             is_purchased=False,
-
-            location_id=None
+            location_id=location_id
         )
 
         db.session.add(plant)
