@@ -1056,11 +1056,16 @@ def list_recommendations():
         if selected_location is not None:  
             suitability_result = check_plant_location_suitability(catalog_plant, selected_location)  
 
-        if suitability_result["suitability"] not in ["geeignet", "bedingt geeignet"]:  
-            continue  
+            if suitability_result["suitability"] not in ["geeignet", "bedingt geeignet"]:  
+                continue  
 
-        suitability = suitability_result["suitability"]  
-        checks = suitability_result["checks"]    
+            suitability = suitability_result["suitability"]  
+            checks = suitability_result["checks"]  
+
+        aesthetic_bonus, aesthetic_reasons = calculate_aesthetic_bonus(  
+            catalog_plant,  
+            inventory_plants_for_bonus  
+        )  
 
         recommendations.append({  
             "id": catalog_plant.id,  
@@ -1077,6 +1082,7 @@ def list_recommendations():
             "flowering_season_start": catalog_plant.flowering_season_start,  
             "flowering_season_end": catalog_plant.flowering_season_end,  
             "flower_color": catalog_plant.flower_color,  
+            "notes": None,  
             "location_id": location_id if selected_location is not None else None,  
             "suitability": suitability,  
             "checks": checks,  
@@ -1085,19 +1091,19 @@ def list_recommendations():
             "created_at": str(catalog_plant.created_at)  
         })  
 
-        suitability_order = {  
+    suitability_order = {  
         "geeignet": 0,  
         "bedingt geeignet": 1,  
         None: 2  
-        }  
+    }  
 
-        recommendations.sort(  
+    recommendations.sort(  
         key=lambda r: (  
             suitability_order.get(r["suitability"], 99),  
             -r["aesthetic_bonus"],  
             r["name"].lower()  
-            )  
         )  
+    )  
 
     return jsonify(recommendations), 200  
 
