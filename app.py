@@ -1090,10 +1090,17 @@ def list_recommendations():
             "created_at": str(catalog_plant.created_at)  
         })  
 
+    suitability_order = {  
+    "geeignet": 0,  
+    "bedingt geeignet": 1,  
+    None: 2  
+    }  
+
     recommendations.sort(  
-        key=lambda r: (  
-            -r["aesthetic_bonus"],  
-            r["name"].lower()  
+    key=lambda r: (  
+        suitability_order.get(r["suitability"], 99),  
+        -r["aesthetic_bonus"],  
+        r["name"].lower()  
         )  
     )  
 
