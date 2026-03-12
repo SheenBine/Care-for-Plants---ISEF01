@@ -1027,7 +1027,7 @@ def list_inventory():
     if location_id is not None:
         query = query.filter_by(location_id=location_id)
 
-    plants = Plant.query.filter_by(user_id=user_id, is_purchased=True).order_by(Plant.created_at.desc()).all()
+    plants = query.order_by(Plant.created_at.desc()).all()  # neu
 
     return jsonify([
         {
@@ -1036,7 +1036,6 @@ def list_inventory():
             "botanical_name": p.botanical_name,
             "location_id": p.location_id,
             "notes": p.notes,
-            "source": "inventory",
             "created_at": str(p.created_at)
         }
         for p in plants
