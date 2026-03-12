@@ -1056,7 +1056,7 @@ def list_recommendations():
         if selected_location is not None:  
             suitability_result = check_plant_location_suitability(catalog_plant, selected_location)  
 
-            if suitability_result["suitability"] != "geeignet":  
+            if suitability_result["suitability"] not in ["geeignet", "bedingt geeignet"]:  
                 continue  
 
             suitability = suitability_result["suitability"]  
