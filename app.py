@@ -615,10 +615,12 @@ def list_wishlist():
     
     location_id = request.args.get("location_id", type=int)
 
-    if location_id is not None:
-        query = query.filter_by(location_id=location_id)
+    query = Plant.query.filter_by(user_id=user_id, is_purchased=False)  # neu
 
-    plants = query.order_by(Plant.created_at.desc()).all()
+    if location_id is not None:
+        query = query.filter_by(location_id=location_id)  # neu
+
+    plants = query.order_by(Plant.created_at.desc()).all()  # neu
 
     return jsonify([
         {
@@ -638,7 +640,6 @@ def list_wishlist():
             "flower_color": p.flower_color,
             "notes": p.notes,
             "location_id": p.location_id,
-            "source": "wishlist",
             "created_at": str(p.created_at)
         }
         for p in plants
