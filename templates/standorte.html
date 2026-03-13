@@ -54,7 +54,8 @@
                             <td>{{ loc.humidity }}</td>
                             <td>{{ loc.description }}</td>
                             <td>
-                                
+                                <a href="/locations/{{loc.id}}/edit">Standort bearbeiten</a>
+                                <a href="/api/locations/{{loc.id}}">Standort löschen</a>
                             </td>
                         </tr>
                         {% endfor %}
