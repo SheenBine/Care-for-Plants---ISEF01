@@ -224,6 +224,7 @@ table {
   margin: 0 0 1em;
   table-layout: auto;
   max-width: 100%;
+  overflow:scroll;
 }
 th {
   font-weight: 700;
