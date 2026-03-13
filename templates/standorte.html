@@ -38,14 +38,15 @@
                         <h4 style="text-align: center">Es gibt noch keine Standorte</h4>
                     {% else %}
                     <table>
-                        <tr>
+                        <thead>
                             <th>Name</th>
                             <th>Lichtverhältnisse</th>
                             <th>Temperatur</th>
                             <th>Luftfeuchtigkeit</th>
                             <th>Beschreibung</th>
                             <th>Änderungen</th>
-                        </tr>
+                        </thead>
+                        <tbody>
                         {% for loc in locations %}
                         <tr>
                             <td>{{ loc.name }}</td>
@@ -59,6 +60,7 @@
                             </td>
                         </tr>
                         {% endfor %}
+                        </tbody>
                     </table>
                     {% endif %}
 

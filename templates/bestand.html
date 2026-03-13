@@ -49,7 +49,7 @@
                         <h4 style="text-align: center">Es gibt noch keine Pflanzen</h4>
                     {% else %}
                     <table>
-                        <tr>
+                        <thead>
                             <th>Name</th>
                             <th>Botanischer Name</th>
                             <th>Benötigtes Licht</th>
@@ -65,7 +65,8 @@
                             <th>Pflanzenfarbe</th>
                             <th>Notizen</th>
                             <th>Pflanze Anpassen</th>
-                        </tr>
+                        </thead>
+                        <tbody>
                         {% for p in plants %}
                         <tr>
                             <td>{{ p.name }}</td>
@@ -87,6 +88,7 @@
                             </td>
                         </tr>
                         {% endfor %}
+                        </tbody>
                     </table>
                     {% endif %}
 
