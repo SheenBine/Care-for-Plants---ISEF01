@@ -48,20 +48,20 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <th><input name="name" placeholder="Name"></th>
-                                <th><input name="botanical_name" placeholder="Botanischer Name"></th>
-                                <th><input name="light_requirement" placeholder="Benötigtes Licht"></th>
-                                <th><input name="water_requirement" placeholder="Benötigtes Wasser"></th>
-                                <th><input name="temperature_requirement" placeholder="Benötigte Temperatur"></th>
-                                <th><input name="humidity_requirement" placeholder="Benötigte Feuchtigkeit"></th>
-                                <th><input name="soil_type" placeholder="Bodenart"></th>
-                                <th><input name="height_min" placeholder="Minimale Höhe"></th>
-                                <th><input name="height_max" placeholder="Maximale Höhe"></th>
-                                <th><input name="poisonous" placeholder="Giftig"></th>
-                                <th><input name="flowering_season_start" placeholder="Blüte Anfang"></th>
-                                <th><input name="flowering_season_end" placeholder="Büte Ende"></th>
-                                <th><input name="flower_color" placeholder="Pflanzenfarbe"></th>
-                                <th><input name="notes" placeholder="Notizen"></th>
+                                <th><input name="name" placeholder="Name" value="{{ p.name }}"></th>
+                                <th><input name="botanical_name" placeholder="Botanischer Name" value="{{ p.botanical_name }}"></th>
+                                <th><input name="light_requirement" placeholder="Benötigtes Licht" value="{{ p.light_requirement }}"></th>
+                                <th><input name="water_requirement" placeholder="Benötigtes Wasser" value="{{ p.water_requirement }}"></th>
+                                <th><input name="temperature_requirement" placeholder="Benötigte Temperatur" value="{{ p.temperature_requirement }}"></th>
+                                <th><input name="humidity_requirement" placeholder="Benötigte Feuchtigkeit" value="{{ p.humidity_requirement }}"></th>
+                                <th><input name="soil_type" placeholder="Bodenart" value="{{ p.soil_type }}"></th>
+                                <th><input name="height_min" placeholder="Minimale Höhe" value="{{ p.height_min }}"></th>
+                                <th><input name="height_max" placeholder="Maximale Höhe" value="{{ p.height_max }}"></th>
+                                <th><input name="poisonous" placeholder="Giftig" value="{{ p.poisonous }}"></th>
+                                <th><input name="flowering_season_start" placeholder="Blüte Anfang" value="{{ p.flowering_season_start }}"></th>
+                                <th><input name="flowering_season_end" placeholder="Büte Ende" value="{{ p.flowering_season_end }}"></th>
+                                <th><input name="flower_color" placeholder="Pflanzenfarbe" value="{{ p.flower_color }}"></th>
+                                <th><input name="notes" placeholder="Notizen" value="{{ p.notes }}"></th>
                             </tr>
                         </tbody>
                     </table>
