@@ -12,7 +12,7 @@
     <!-- Header Bereich -->
         <header class="header_Leiste">
 
-            <!-- Content -->
+            <!-- Head Text -->
             <div>
                 <h1>Care for Plants</h1>
                 <h2>Standorte</h2>
@@ -29,10 +29,37 @@
 
         </header>
 
+        <!-- !!! Fehlermendung Ausgeben !!! -->
+        <h2>{{ f }}</h2>
+
+
+        
+
         <!-- Content Bereich -->
         <div class="continer">
             <div class="row">
-                <!-- Tabelle mit Pflanzen -->
+                <!-- Neuer Standort -->
+                <div class="col-6">
+                    <table>
+                        <thead>
+                            <th>Name</th>
+                            <th>Lichtverhältnisse</th>
+                            <th>Temperatur</th>
+                            <th>Luftfeuchtigkeit</th>
+                            <th>Beschreibung</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th><input name="name" placeholder="Name"></th>
+                                <th><input name="lighting_condition" placeholder="Lichtverhältnisse"></th>
+                                <th><input name="temperature" placeholder="Temperatur"></th>
+                                <th><input name="humidity" placeholder="Luftfeuchtigkeit"></th>
+                                <th><input name="description" placeholder="Beschreibung"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Tabelle mit Standorten -->
                 <div class="col-6">
                     {% if locations|length < 1 %}
                         <h4 style="text-align: center">Es gibt noch keine Standorte</h4>
