@@ -32,28 +32,34 @@
         <!-- Content Bereich -->
         <div class="continer">
             <div class="row">
-                <!-- Standort Ändern -->
-                <div class="col-6">
-                    <table>
-                        <thead>
-                            <th>Name</th>
-                            <th>Lichtverhältnisse</th>
-                            <th>Temperatur</th>
-                            <th>Luftfeuchtigkeit</th>
-                            <th>Beschreibung</th>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th><input name="name" placeholder="Name" value="{{ loc.name }}"></th>
-                                <th><input name="lighting_condition" placeholder="Lichtverhältnisse" value="{{ loc.lighting_condition }}"></th>
-                                <th><input name="temperature" placeholder="Temperatur" value="{{ loc.temperature }}"></th>
-                                <th><input name="humidity" placeholder="Luftfeuchtigkeit" value="{{ loc.humidity }}"></th>
-                                <th><input name="description" placeholder="Beschreibung" value="{{ loc.description }}"></th>
-                            </tr>
-                        </tbody>
-                    </table>
+                <form action="" method="POST">
+                    <!-- Standort Ändern -->
+                    <div class="col-6">
+                        <table>
+                            <thead>
+                                <th>Name</th>
+                                <th>Lichtverhältnisse</th>
+                                <th>Temperatur</th>
+                                <th>Luftfeuchtigkeit</th>
+                                <th>Beschreibung</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th><input name="name" placeholder="Name" value="{{ loc.name }}"></th>
+                                    <th><input name="lighting_condition" placeholder="Lichtverhältnisse" value="{{ loc.lighting_condition }}"></th>
+                                    <th><input name="temperature" placeholder="Temperatur" value="{{ loc.temperature }}"></th>
+                                    <th><input name="humidity" placeholder="Luftfeuchtigkeit" value="{{ loc.humidity }}"></th>
+                                    <th><input name="description" placeholder="Beschreibung" value="{{ loc.description }}"></th>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                </div>
+                    </div>
+                    <div class="col-6">
+                        <button type="submit" name="action" value="speichern">Speichern</button>
+                    </div>
+                </form>
+                <a href="/"><button>Abbrechen</button></a>
             </div>
         </div>
 

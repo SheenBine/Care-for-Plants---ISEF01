@@ -39,26 +39,32 @@
         <div class="continer">
             <div class="row">
                 <!-- Neuer Standort -->
-                <div class="col-6">
-                    <table>
-                        <thead>
-                            <th>Name</th>
-                            <th>Lichtverhältnisse</th>
-                            <th>Temperatur</th>
-                            <th>Luftfeuchtigkeit</th>
-                            <th>Beschreibung</th>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th><input name="name" placeholder="Name"></th>
-                                <th><input name="lighting_condition" placeholder="Lichtverhältnisse"></th>
-                                <th><input name="temperature" placeholder="Temperatur"></th>
-                                <th><input name="humidity" placeholder="Luftfeuchtigkeit"></th>
-                                <th><input name="description" placeholder="Beschreibung"></th>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <form action="" method="POST">
+                    <div class="col-6">
+                        <table>
+                            <thead>
+                                <th>Name</th>
+                                <th>Lichtverhältnisse</th>
+                                <th>Temperatur</th>
+                                <th>Luftfeuchtigkeit</th>
+                                <th>Beschreibung</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th><input name="name" placeholder="Name"></th>
+                                    <th><input name="lighting_condition" placeholder="Lichtverhältnisse"></th>
+                                    <th><input name="temperature" placeholder="Temperatur"></th>
+                                    <th><input name="humidity" placeholder="Luftfeuchtigkeit"></th>
+                                    <th><input name="description" placeholder="Beschreibung"></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <button type="submit" name="action" value="speichern">Speichern</button>
+                    </div>
+                </form>
+                <a href="/"><button>Abbrechen</button></a>
                 <!-- Tabelle mit Standorten -->
                 <div class="col-6">
                     {% if locations|length < 1 %}

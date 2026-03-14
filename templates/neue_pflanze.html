@@ -34,46 +34,52 @@
         <!-- Content Bereich -->
         <div class="continer">
             <div class="row">
+                <form action="" method="POST">
                 <!-- Tabelle mit Pflanzen -->
-                <div class="col-6">
-                    <table>
-                        <thead>
-                            <th>Name</th>
-                            <th>Botanischer Name</th>
-                            <th>Benötigtes Licht</th>
-                            <th>Benötigtes Wasser</th>
-                            <th>Benötigte Temperatur</th>
-                            <th>Benötigte Feuchtigkeit</th>
-                            <th>Bodenart</th>
-                            <th>Minimale Höhe</th>
-                            <th>Maximale Höhe</th>
-                            <th>Giftig</th>
-                            <th>Blüte Anfang</th>
-                            <th>Büte Ende</th>
-                            <th>Pflanzenfarbe</th>
-                            <th>Notizen</th>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th><input name="name" placeholder="Name"></th>
-                                <th><input name="botanical_name" placeholder="Botanischer Name"></th>
-                                <th><input name="light_requirement" placeholder="Benötigtes Licht"></th>
-                                <th><input name="water_requirement" placeholder="Benötigtes Wasser"></th>
-                                <th><input name="temperature_requirement" placeholder="Benötigte Temperatur"></th>
-                                <th><input name="humidity_requirement" placeholder="Benötigte Feuchtigkeit"></th>
-                                <th><input name="soil_type" placeholder="Bodenart"></th>
-                                <th><input name="height_min" placeholder="Minimale Höhe"></th>
-                                <th><input name="height_max" placeholder="Maximale Höhe"></th>
-                                <th><input name="poisonous" placeholder="Giftig"></th>
-                                <th><input name="flowering_season_start" placeholder="Blüte Anfang"></th>
-                                <th><input name="flowering_season_end" placeholder="Büte Ende"></th>
-                                <th><input name="flower_color" placeholder="Pflanzenfarbe"></th>
-                                <th><input name="notes" placeholder="Notizen"></th>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="col-6">
+                        <table>
+                            <thead>
+                                <th>Name</th>
+                                <th>Botanischer Name</th>
+                                <th>Benötigtes Licht</th>
+                                <th>Benötigtes Wasser</th>
+                                <th>Benötigte Temperatur</th>
+                                <th>Benötigte Feuchtigkeit</th>
+                                <th>Bodenart</th>
+                                <th>Minimale Höhe</th>
+                                <th>Maximale Höhe</th>
+                                <th>Giftig</th>
+                                <th>Blüte Anfang</th>
+                                <th>Büte Ende</th>
+                                <th>Pflanzenfarbe</th>
+                                <th>Notizen</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th><input name="name" placeholder="Name"></th>
+                                    <th><input name="botanical_name" placeholder="Botanischer Name"></th>
+                                    <th><input name="light_requirement" placeholder="Benötigtes Licht"></th>
+                                    <th><input name="water_requirement" placeholder="Benötigtes Wasser"></th>
+                                    <th><input name="temperature_requirement" placeholder="Benötigte Temperatur"></th>
+                                    <th><input name="humidity_requirement" placeholder="Benötigte Feuchtigkeit"></th>
+                                    <th><input name="soil_type" placeholder="Bodenart"></th>
+                                    <th><input name="height_min" placeholder="Minimale Höhe"></th>
+                                    <th><input name="height_max" placeholder="Maximale Höhe"></th>
+                                    <th><input name="poisonous" placeholder="Giftig"></th>
+                                    <th><input name="flowering_season_start" placeholder="Blüte Anfang"></th>
+                                    <th><input name="flowering_season_end" placeholder="Büte Ende"></th>
+                                    <th><input name="flower_color" placeholder="Pflanzenfarbe"></th>
+                                    <th><input name="notes" placeholder="Notizen"></th>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                </div>
+                    </div>
+                    <div class="col-6">
+                        <button type="submit" name="action" value="speichern">Speichern</button>
+                    </div>
+                </form>
+                <a href="/"><button>Abbrechen</button></a>
             </div>
         </div>
 
