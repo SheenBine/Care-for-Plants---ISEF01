@@ -37,6 +37,7 @@
                     <table>
                         <thead>
                             <th>Name</th>
+                            <th>Standort</th>
                             <th>Botanischer Name</th>
                             <th>Benötigtes Licht</th>
                             <th>Benötigtes Wasser</th>
@@ -54,6 +55,7 @@
                         <tbody>
                             <tr>
                                 <th><input name="name" placeholder="Name" value="{{ p.name }}"></th>
+                                <th><input name="location" placeholder="Standort" value="{{ p.location }}"></th>
                                 <th><input name="botanical_name" placeholder="Botanischer Name" value="{{ p.botanical_name }}"></th>
                                 <th><input name="light_requirement" placeholder="Benötigtes Licht" value="{{ p.light_requirement }}"></th>
                                 <th><input name="water_requirement" placeholder="Benötigtes Wasser" value="{{ p.water_requirement }}"></th>

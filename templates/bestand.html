@@ -51,6 +51,7 @@
                     <table>
                         <thead>
                             <th>Name</th>
+                            <th>Standort</th>
                             <th>Botanischer Name</th>
                             <th>Benötigtes Licht</th>
                             <th>Benötigtes Wasser</th>
@@ -70,6 +71,7 @@
                         {% for p in plants %}
                         <tr>
                             <td>{{ p.name }}</td>
+                            <td>{{ p.location }}</td>
                             <td>{{ p.botanical_name }}</td>
                             <td>{{ p.light_requirement }}</td>
                             <td>{{ p.water_requirement }}</td>
