@@ -46,9 +46,24 @@
                             <tbody>
                                 <tr>
                                     <th><input name="name" placeholder="Name" value="{{ loc.name }}"></th>
-                                    <th><input name="lighting_condition" placeholder="Lichtverhältnisse" value="{{ loc.lighting_condition }}"></th>
-                                    <th><input name="temperature" placeholder="Temperatur" value="{{ loc.temperature }}"></th>
-                                    <th><input name="humidity" placeholder="Luftfeuchtigkeit" value="{{ loc.humidity }}"></th>
+                                    <th><select name="lighting_condition" placeholder="Lichtverhältnisse" value="{{ loc.lighting_condition }}">
+                                        <option value=""></option>
+                                        <option value="schatten">Schatten</option>
+                                        <option value="halbschatten">Halbschatten</option>
+                                        <option value="sonnig">Sonnig</option>
+                                    </select></th>
+                                    <th><select name="temperature" placeholder="Temperatur" value="{{ loc.temperature }}">
+                                        <option value=""></option>
+                                        <option value="kalt">Kalt</option>
+                                        <option value="normal">Normal</option>
+                                        <option value="warm">Warm</option>
+                                    </select></th>
+                                    <th><select name="humidity" placeholder="Luftfeuchtigkeit" value="{{ loc.humidity }}">
+                                        <option value=""></option>
+                                        <option value="trocken">Trocken</option>
+                                        <option value="normal">Normal</option>
+                                        <option value="feucht">Feucht</option>
+                                    </select></th>
                                     <th><input name="description" placeholder="Beschreibung" value="{{ loc.description }}"></th>
                                 </tr>
                             </tbody>

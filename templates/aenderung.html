@@ -55,19 +55,44 @@
                         <tbody>
                             <tr>
                                 <th><input name="name" placeholder="Name" value="{{ p.name }}"></th>
-                                <th><input name="location" placeholder="Standort" value="{{ p.location }}"></th>
+                                <th><select name="location" placeholder="Standort" value="{{ p.location }}">
+                                    <option value=""></option>
+                                    {% for location in locations %}
+                                        <option value="location.name">location.name</option>
+                                    {% endfor %}
+                                </select></th>
                                 <th><input name="botanical_name" placeholder="Botanischer Name" value="{{ p.botanical_name }}"></th>
-                                <th><input name="light_requirement" placeholder="Benötigtes Licht" value="{{ p.light_requirement }}"></th>
-                                <th><input name="water_requirement" placeholder="Benötigtes Wasser" value="{{ p.water_requirement }}"></th>
-                                <th><input name="temperature_requirement" placeholder="Benötigte Temperatur" value="{{ p.temperature_requirement }}"></th>
-                                <th><input name="humidity_requirement" placeholder="Benötigte Feuchtigkeit" value="{{ p.humidity_requirement }}"></th>
+                                <th><select name="light_requirement" placeholder="Benötigtes Licht" value="{{ p.light_requirement }}">
+                                    <option value=""></option>
+                                    <option value="schatten">Schatten</option>
+                                    <option value="halbschatten">Halbschatten</option>
+                                    <option value="sonnig">Sonnig</option>
+                                </select></th>
+                                <th><select name="water_requirement" placeholder="Benötigtes Wasser" value="{{ p.water_requirement }}">
+                                    <option value=""></option>
+                                    <option value="wenig">Wenig</option>
+                                    <option value="mittel">Mittel</option>
+                                    <option value="viel">Viel</option>
+                                </select></th>
+                                <th><select name="temperature_requirement" placeholder="Benötigte Temperatur" value="{{ p.temperature_requirement }}">
+                                    <option value=""></option>
+                                    <option value="kalt">Kalt</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="warm">Warm</option>
+                                </select></th>
+                                <th><select name="humidity_requirement" placeholder="Benötigte Feuchtigkeit" value="{{ p.humidity_requirement }}">
+                                    <option value=""></option>
+                                    <option value="trocken">Trocken</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="feucht">Feucht</option>
+                                </select></th>
                                 <th><input name="soil_type" placeholder="Bodenart" value="{{ p.soil_type }}"></th>
-                                <th><input name="height_min" placeholder="Minimale Höhe" value="{{ p.height_min }}"></th>
-                                <th><input name="height_max" placeholder="Maximale Höhe" value="{{ p.height_max }}"></th>
-                                <th><input name="poisonous" placeholder="Giftig" value="{{ p.poisonous }}"></th>
-                                <th><input name="flowering_season_start" placeholder="Blüte Anfang" value="{{ p.flowering_season_start }}"></th>
-                                <th><input name="flowering_season_end" placeholder="Büte Ende" value="{{ p.flowering_season_end }}"></th>
-                                <th><input name="flower_color" placeholder="Pflanzenfarbe" value="{{ p.flower_color }}"></th>
+                                <th><input type="number" min="0" step="1" name="height_min" placeholder="Minimale Höhe" value="{{ p.height_min }}"></th>
+                                <th><input type="number" min="0" step="1" name="height_max" placeholder="Maximale Höhe" value="{{ p.height_max }}"></th>
+                                <th><input type="checkbox" name="poisonous" placeholder="Giftig" {% if {{ p.poisonous }} %} checked {% endif %}></th>
+                                <th><input type="number" min="0" max="12" step="1" name="flowering_season_start" placeholder="Blüte Anfang" value="{{ p.flowering_season_start }}"></th>
+                                <th><input type="number" min="0" max="12" step="1" name="flowering_season_end" placeholder="Büte Ende" value="{{ p.flowering_season_end }}"></th>
+                                <th><input name="flower_color" placeholder="BlumenFarbe" value="{{ p.flower_color }}"></th>
                                 <th><input name="notes" placeholder="Notizen" value="{{ p.notes }}"></th>
                             </tr>
                         </tbody>
@@ -85,3 +110,7 @@
 
 
 </html>
+
+
+
+
