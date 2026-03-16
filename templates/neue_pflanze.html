@@ -58,18 +58,43 @@
                             <tbody>
                                 <tr>
                                     <th><input name="name" placeholder="Name"></th>
-                                    <th><input name="location" placeholder="Standort"></th>
+                                    <th><select name="location" placeholder="Standort">
+                                        <option value=""></option>
+                                        {% for location in locations %}
+                                            <option value="location.name">location.name</option>
+                                        {% endfor %}
+                                    </select></th>
                                     <th><input name="botanical_name" placeholder="Botanischer Name"></th>
-                                    <th><input name="light_requirement" placeholder="Benötigtes Licht"></th>
-                                    <th><input name="water_requirement" placeholder="Benötigtes Wasser"></th>
-                                    <th><input name="temperature_requirement" placeholder="Benötigte Temperatur"></th>
-                                    <th><input name="humidity_requirement" placeholder="Benötigte Feuchtigkeit"></th>
+                                    <th><select name="light_requirement" placeholder="Benötigtes Licht">
+                                        <option value=""></option>
+                                        <option value="schatten">Schatten</option>
+                                        <option value="halbschatten">Halbschatten</option>
+                                        <option value="sonnig">Sonnig</option>
+                                    </select></th>
+                                    <th><select name="water_requirement" placeholder="Benötigtes Wasser">
+                                        <option value=""></option>
+                                        <option value="wenig">Wenig</option>
+                                        <option value="mittel">Mittel</option>
+                                        <option value="viel">Viel</option>
+                                    </select></th>
+                                    <th><select name="temperature_requirement" placeholder="Benötigte Temperatur">
+                                        <option value=""></option>
+                                        <option value="kalt">Kalt</option>
+                                        <option value="normal">Normal</option>
+                                        <option value="warm">Warm</option>
+                                    </select></th>
+                                    <th><select name="humidity_requirement" placeholder="Benötigte Feuchtigkeit">
+                                        <option value=""></option>
+                                        <option value="trocken">Trocken</option>
+                                        <option value="normal">Normal</option>
+                                        <option value="feucht">Feucht</option>
+                                    </select></th>
                                     <th><input name="soil_type" placeholder="Bodenart"></th>
-                                    <th><input name="height_min" placeholder="Minimale Höhe"></th>
-                                    <th><input name="height_max" placeholder="Maximale Höhe"></th>
-                                    <th><input name="poisonous" placeholder="Giftig"></th>
-                                    <th><input name="flowering_season_start" placeholder="Blüte Anfang"></th>
-                                    <th><input name="flowering_season_end" placeholder="Büte Ende"></th>
+                                    <th><input type="number" min="0" step="1" name="height_min" placeholder="Minimale Höhe"></th>
+                                    <th><input type="number" min="0" step="1" name="height_max" placeholder="Maximale Höhe"></th>
+                                    <th><input type="checkbox" name="poisonous" placeholder="Giftig" checked></th>
+                                    <th><input type="number" min="0" max="12" step="1" name="flowering_season_start" placeholder="Blüte Anfang"></th>
+                                    <th><input type="number" min="0" max="12" step="1" name="flowering_season_end" placeholder="Büte Ende"></th>
                                     <th><input name="flower_color" placeholder="Pflanzenfarbe"></th>
                                     <th><input name="notes" placeholder="Notizen"></th>
                                 </tr>
