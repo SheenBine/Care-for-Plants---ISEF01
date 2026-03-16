@@ -40,7 +40,7 @@
                     {% for location in locations %}
                     <br>
                     <button type="submit" name="action" value="{{ location.id }}">{{ location.name }}</button>
-                    {% endfor %}
+                    {% endfor %} <!-- URL Geben -->
                 </div>
                 <!-- Tabelle mit Pflanzen -->
                 <div class="col-4">
@@ -83,7 +83,7 @@
                             <td>{{ p.flower_color }}</td>
                             <td>{{ p.notes }}</td>
                             <td>
-                                <a href="">Zur Wunschliste hinzufügen</a>
+                                <a href="">Zur Wunschliste hinzufügen</a> <!-- URL Geben -->
                             </td>
                         </tr>
                         {% endfor %}
