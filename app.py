@@ -211,7 +211,7 @@ with app.app_context():
 
         ficus = Plant(
             user_id=user.id,
-            name="Ficus",
+            name="Gummibaum",
             botanical_name="Ficus elastica",
             light_requirement="halbschatten",
             water_requirement="mittel",
