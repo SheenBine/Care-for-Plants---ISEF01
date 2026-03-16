@@ -61,7 +61,7 @@
                                     <th><select name="location" placeholder="Standort">
                                         <option value=""></option>
                                         {% for location in locations %}
-                                            <option value="location.name">location.name</option>
+                                            <option value="{{ location.name }}">{{ location.name }}</option>
                                         {% endfor %}
                                     </select></th>
                                     <th><input name="botanical_name" placeholder="Botanischer Name"></th>
