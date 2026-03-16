@@ -571,8 +571,10 @@ def new_plant_page():
     '''
     if 'username' not in session:
         return redirect(url_for('auth'))
+    
+    locations = Location.query.filter_by(user_id=session['user_id']).order_by(Location.created_at.desc()).all()
 
-    return render_template('neue_pflanze.html', username=session['username'])
+    return render_template('neue_pflanze.html', username=session['username'], locations=locations)
 
 
 @app.route('/plants/<int:plant_id>/edit', methods=['GET'])
@@ -583,10 +585,13 @@ def edit_plant_page(plant_id):
     if 'username' not in session:
         return redirect(url_for('auth'))
 
+    locations = Location.query.filter_by(user_id=session['user_id']).order_by(Location.created_at.desc()).all()
+
     return render_template(
         'aenderung.html',
         username=session['username'],
-        plant_id=plant_id
+        plant_id=plant_id,
+        locations=locations
     )
 
 
