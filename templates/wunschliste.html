@@ -39,7 +39,9 @@
                     </a>
                     {% for location in locations %}
                     <br>
-                    <button type="submit" name="action" value="{{ location.id }}">{{ location.name }}</button>
+                    <a href="/inventory/{{ location.id }}">
+                        <button class="location_button">{{ location.name }}</button>
+                    </a>
                     {% endfor %}<!-- URL Geben -->
                 </div>
                 <!-- Tabelle mit Pflanzen -->

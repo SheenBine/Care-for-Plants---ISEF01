@@ -40,7 +40,9 @@
                     </a>
                     {% for location in locations %}
                     <br>
-                    <button type="submit" name="action" value="{{ location.id }}" class="location_button">{{ location.name }}</button>
+                    <a href="/inventory/{{ location.id }}">
+                        <button class="location_button">{{ location.name }}</button>
+                    </a>
                     <!-- URL Geben -->
                     {% endfor %}
                 </div>
