@@ -521,7 +521,7 @@ def home():
 @app.route('/auth', methods=['GET', 'POST'])
 def auth():
     '''
-    Login und Registrierung auf einer Seite.
+    Login und Registrierung auf einer Seite
     - GET: zeigt login.html
     - POST: verarbeitet Formular mit 'login' oder 'register'
     '''
@@ -533,7 +533,7 @@ def auth():
         # Registrierung
         if action == 'register':
             if User.query.filter_by(username=username).first():
-                return "Benutzer existiert bereits!"
+                return render_template('login.html', error="Benutzer existiert bereits!")
             try:
                 user = User(username=username)
                 user.set_password(password)
@@ -545,7 +545,7 @@ def auth():
                 return redirect(url_for('home'))
             except Exception as e:
                 db.session.rollback()
-                return f"Fehler bei der Registrierung: {str(e)}"
+                return render_template('login.html', error=f"Fehler bei der Registrierung: {str(e)}")
 
         # Login
         elif action == 'login':
@@ -557,10 +557,10 @@ def auth():
                 # Auf die Startseite weiterleiten
                 return redirect(url_for('home'))
             else:
-                return "Login fehlgeschlagen!"
+                return render_template('login.html', error="Login fehlgeschlagen!")
 
     # Standardmäßig GET, um Login/Registrierung zu zeigen
-    return render_template('login.html')
+    return render_template('login.html', error=None)
 
 
 @app.route('/logout')
@@ -643,7 +643,15 @@ def locations_page():
     if 'username' not in session:
         return redirect(url_for('auth'))
 
-    return render_template('standorte.html', username=session['username'])
+    user_id = session['user_id']
+    locations = get_user_locations(user_id)
+
+    return render_template(
+        'standorte.html',
+        username=session['username'],
+        locations=locations,
+        error=None
+    )
 
 @app.route('/locations/<int:location_id>/plants', methods=['GET'])
 def location_plants_page(location_id):
@@ -781,13 +789,53 @@ def edit_plant_page(plant_id):
     if 'username' not in session:
         return redirect(url_for('auth'))
 
-    locations = Location.query.filter_by(user_id=session['user_id']).order_by(Location.created_at.desc()).all()
+    user_id = session['user_id']
+
+    plant = Plant.query.filter_by(id=plant_id, user_id=user_id).first()
+    if not plant:
+        return render_template(
+            'aenderung.html',
+            username=session['username'],
+            plant=None,
+            locations=[],
+            error="Pflanze nicht gefunden"
+        )
+
+    locations = get_user_locations(user_id)
+
+    location_name = None
+    if plant.location_id is not None:
+        location = Location.query.filter_by(id=plant.location_id, user_id=user_id).first()
+        if location:
+            location_name = location.name
+
+    plant_data = {
+        "id": plant.id,
+        "name": plant.name,
+        "botanical_name": plant.botanical_name,
+        "light_requirement": plant.light_requirement,
+        "water_requirement": plant.water_requirement,
+        "temperature_requirement": plant.temperature_requirement,
+        "humidity_requirement": plant.humidity_requirement,
+        "soil_type": plant.soil_type,
+        "height_min": plant.height_min,
+        "height_max": plant.height_max,
+        "poisonous": bool(plant.poisonous),
+        "flowering_season_start": plant.flowering_season_start,
+        "flowering_season_end": plant.flowering_season_end,
+        "flower_color": plant.flower_color,
+        "notes": plant.notes,
+        "is_purchased": bool(plant.is_purchased),
+        "location_id": plant.location_id,
+        "location_name": location_name
+    }
 
     return render_template(
         'aenderung.html',
         username=session['username'],
-        plant_id=plant_id,
-        locations=locations
+        plant=plant_data,
+        locations=locations,
+        error=None
     )
 
 
@@ -799,10 +847,31 @@ def edit_location_page(location_id):
     if 'username' not in session:
         return redirect(url_for('auth'))
 
+    user_id = session['user_id']
+
+    location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    if not location:
+        return render_template(
+            'aendern_standort.html',
+            username=session['username'],
+            location=None,
+            error="Standort nicht gefunden"
+        )
+
+    location_data = {
+        "id": location.id,
+        "name": location.name,
+        "lighting_condition": location.lighting_condition,
+        "temperature": location.temperature,
+        "humidity": location.humidity,
+        "description": location.description
+    }
+
     return render_template(
         'aendern_standort.html',
         username=session['username'],
-        location_id=location_id
+        location=location_data,
+        error=None
     )
 
 @app.route('/api/wishlist', methods=['GET'])
