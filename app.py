@@ -1387,6 +1387,139 @@ def move_plant_to_inventory(plant_id):
             error="Fehler beim Verschieben in den Bestand."
         )
 
+@app.route('/catalog/<int:catalog_plant_id>/add-to-wishlist', methods=['POST'])
+def add_catalog_plant_to_wishlist(catalog_plant_id):
+    '''
+    Pflanze aus dem Katalog zur Wunschliste hinzufügen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    user_id = session['user_id']
+
+    catalog_plant = PlantCatalog.query.filter_by(id=catalog_plant_id).first()
+    if not catalog_plant:
+        return redirect(url_for('plants_page'))
+
+    existing_plants = Plant.query.filter_by(user_id=user_id).all()
+    existing_keys = {get_plant_identity(p) for p in existing_plants}
+
+    if get_plant_identity(catalog_plant) in existing_keys:
+        locations = get_user_locations(user_id)
+        selected_location = get_selected_location(user_id)
+
+        all_user_plants = Plant.query.filter_by(user_id=user_id).all()
+        owned_plant_keys = {get_plant_identity(p) for p in all_user_plants}
+        inventory_plants = Plant.query.filter_by(user_id=user_id, is_purchased=True).all()
+
+        if selected_location is not None:
+            inventory_plants_for_bonus = Plant.query.filter_by(
+                user_id=user_id,
+                is_purchased=True,
+                location_id=selected_location.id
+            ).all()
+        else:
+            inventory_plants_for_bonus = inventory_plants
+
+        catalog_plants = PlantCatalog.query.order_by(PlantCatalog.name.asc()).all()
+        recommendations = []
+
+        for cp in catalog_plants:
+            if get_plant_identity(cp) in owned_plant_keys:
+                continue
+
+            suitability = None
+            checks = []
+
+            if selected_location is not None:
+                suitability_result = check_plant_location_suitability(cp, selected_location)
+                if suitability_result["suitability"] not in ["geeignet", "bedingt geeignet"]:
+                    continue
+                suitability = suitability_result["suitability"]
+                checks = suitability_result["checks"]
+
+            aesthetic_bonus, aesthetic_reasons = calculate_aesthetic_bonus(
+                cp,
+                inventory_plants_for_bonus
+            )
+
+            recommendations.append({
+                "id": cp.id,
+                "name": cp.name,
+                "botanical_name": cp.botanical_name,
+                "light_requirement": cp.light_requirement,
+                "water_requirement": cp.water_requirement,
+                "temperature_requirement": cp.temperature_requirement,
+                "humidity_requirement": cp.humidity_requirement,
+                "soil_type": cp.soil_type,
+                "height_min": cp.height_min,
+                "height_max": cp.height_max,
+                "poisonous": bool(cp.poisonous),
+                "flowering_season_start": cp.flowering_season_start,
+                "flowering_season_end": cp.flowering_season_end,
+                "flower_color": cp.flower_color,
+                "notes": None,
+                "location_id": selected_location.id if selected_location else None,
+                "location_name": selected_location.name if selected_location else None,
+                "suitability": suitability,
+                "checks": checks,
+                "aesthetic_bonus": aesthetic_bonus,
+                "aesthetic_reasons": aesthetic_reasons,
+                "created_at": str(cp.created_at)
+            })
+
+        suitability_order = {
+            "geeignet": 0,
+            "bedingt geeignet": 1,
+            None: 2
+        }
+
+        recommendations.sort(
+            key=lambda r: (
+                suitability_order.get(r["suitability"], 99),
+                -r["aesthetic_bonus"],
+                r["name"].lower()
+            )
+        )
+
+        return render_template(
+            'liste_von_pflanzen.html',
+            username=session['username'],
+            locations=locations,
+            plants=recommendations,
+            selected_location_id=selected_location.id if selected_location else None,
+            error="Diese Pflanze ist bereits in Wunschliste oder Bestand vorhanden."
+        )
+
+    try:
+        plant = Plant(
+            user_id=user_id,
+            name=catalog_plant.name,
+            botanical_name=catalog_plant.botanical_name,
+            light_requirement=catalog_plant.light_requirement,
+            water_requirement=catalog_plant.water_requirement,
+            temperature_requirement=catalog_plant.temperature_requirement,
+            humidity_requirement=catalog_plant.humidity_requirement,
+            soil_type=catalog_plant.soil_type,
+            height_min=catalog_plant.height_min,
+            height_max=catalog_plant.height_max,
+            poisonous=bool(catalog_plant.poisonous),
+            flowering_season_start=catalog_plant.flowering_season_start,
+            flowering_season_end=catalog_plant.flowering_season_end,
+            flower_color=catalog_plant.flower_color,
+            notes=None,
+            is_purchased=False,
+            location_id=None
+        )
+
+        db.session.add(plant)
+        db.session.commit()
+        return redirect(url_for('wishlist_page'))
+
+    except Exception:
+        db.session.rollback()
+        return redirect(url_for('plants_page'))
+
 @app.route('/api/locations', methods=['GET'])
 def list_locations():
     '''
