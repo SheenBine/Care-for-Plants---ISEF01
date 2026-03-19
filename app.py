@@ -969,26 +969,7 @@ def edit_plant_page(plant_id):
         if location:
             location_name = location.name
 
-    plant_data = {
-        "id": plant.id,
-        "name": plant.name,
-        "botanical_name": plant.botanical_name,
-        "light_requirement": plant.light_requirement,
-        "water_requirement": plant.water_requirement,
-        "temperature_requirement": plant.temperature_requirement,
-        "humidity_requirement": plant.humidity_requirement,
-        "soil_type": plant.soil_type,
-        "height_min": plant.height_min,
-        "height_max": plant.height_max,
-        "poisonous": bool(plant.poisonous),
-        "flowering_season_start": plant.flowering_season_start,
-        "flowering_season_end": plant.flowering_season_end,
-        "flower_color": plant.flower_color,
-        "notes": plant.notes,
-        "is_purchased": bool(plant.is_purchased),
-        "location_id": plant.location_id,
-        "location_name": location_name
-    }
+    plant_data = build_plant_data(plant, user_id)
 
     return render_template(
         'aenderung.html',
@@ -1036,25 +1017,7 @@ def update_plant_form(plant_id):
     is_purchased = request.form.get('is_purchased') == 'on'
 
     if not name:
-        plant_data = {
-            "id": plant.id,
-            "name": plant.name,
-            "botanical_name": plant.botanical_name,
-            "light_requirement": plant.light_requirement,
-            "water_requirement": plant.water_requirement,
-            "temperature_requirement": plant.temperature_requirement,
-            "humidity_requirement": plant.humidity_requirement,
-            "soil_type": plant.soil_type,
-            "height_min": plant.height_min,
-            "height_max": plant.height_max,
-            "poisonous": bool(plant.poisonous),
-            "flowering_season_start": plant.flowering_season_start,
-            "flowering_season_end": plant.flowering_season_end,
-            "flower_color": plant.flower_color,
-            "notes": plant.notes,
-            "is_purchased": bool(plant.is_purchased),
-            "location_id": plant.location_id
-        }
+        plant_data = build_plant_data(plant, user_id)
 
         return render_template(
             'aenderung.html',
@@ -1069,7 +1032,7 @@ def update_plant_form(plant_id):
         return render_template(
             'aenderung.html',
             username=session['username'],
-            plant=plant,
+            plant=build_plant_data(plant, user_id),
             locations=locations,
             error=err[0].json.get("error")
         )
@@ -1079,7 +1042,7 @@ def update_plant_form(plant_id):
         return render_template(
             'aenderung.html',
             username=session['username'],
-            plant=plant,
+            plant=build_plant_data(plant, user_id),
             locations=locations,
             error=err[0].json.get("error")
         )
@@ -1089,7 +1052,7 @@ def update_plant_form(plant_id):
         return render_template(
             'aenderung.html',
             username=session['username'],
-            plant=plant,
+            plant=build_plant_data(plant, user_id),
             locations=locations,
             error=err[0].json.get("error")
         )
@@ -1099,7 +1062,7 @@ def update_plant_form(plant_id):
         return render_template(
             'aenderung.html',
             username=session['username'],
-            plant=plant,
+            plant=build_plant_data(plant, user_id),
             locations=locations,
             error=err[0].json.get("error")
         )
@@ -1109,7 +1072,7 @@ def update_plant_form(plant_id):
         return render_template(
             'aenderung.html',
             username=session['username'],
-            plant=plant,
+            plant=build_plant_data(plant, user_id),
             locations=locations,
             error=location_error
         )
@@ -1143,7 +1106,7 @@ def update_plant_form(plant_id):
         return render_template(
             'aenderung.html',
             username=session['username'],
-            plant=plant,
+            plant=build_plant_data(plant, user_id),
             locations=locations,
             error=f"Fehler beim Speichern: {str(e)}"
         )
