@@ -1125,6 +1125,62 @@ def update_plant_form(plant_id):
             error=f"Fehler beim Speichern: {str(e)}"
         )
 
+@app.route('/plants/<int:plant_id>/delete', methods=['POST'])
+def delete_plant(plant_id):
+    '''
+    Pflanze aus Wunschliste oder Bestand löschen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    user_id = session['user_id']
+
+    plant = Plant.query.filter_by(id=plant_id, user_id=user_id).first()
+    if not plant:
+        return redirect(url_for('wishlist_page'))
+
+    was_purchased = bool(plant.is_purchased)
+
+    try:
+        db.session.delete(plant)
+        db.session.commit()
+
+        if was_purchased:
+            return redirect(url_for('inventory_page'))
+        return redirect(url_for('wishlist_page'))
+
+    except Exception:
+        db.session.rollback()
+
+        if was_purchased:
+            locations = get_user_locations(user_id)
+            query = Plant.query.filter_by(user_id=user_id, is_purchased=True)
+            plants = query.order_by(Plant.created_at.desc()).all()
+            plants_data = add_location_name_to_plants(plants, user_id)
+
+            return render_template(
+                'bestand.html',
+                username=session['username'],
+                locations=locations,
+                plants=plants_data,
+                selected_location_id=None,
+                error="Fehler beim Löschen der Pflanze."
+            )
+
+        locations = get_user_locations(user_id)
+        query = Plant.query.filter_by(user_id=user_id, is_purchased=False)
+        plants = query.order_by(Plant.created_at.desc()).all()
+        plants_data = add_location_name_to_plants(plants, user_id)
+
+        return render_template(
+            'wunschliste.html',
+            username=session['username'],
+            locations=locations,
+            plants=plants_data,
+            selected_location_id=None,
+            error="Fehler beim Löschen der Pflanze."
+        )
+
 @app.route('/locations/<int:location_id>/edit', methods=['GET'])
 def edit_location_page(location_id):
     '''
