@@ -862,7 +862,7 @@ def create_plant():
             'neue_pflanze.html',
             username=session['username'],
             locations=locations,
-            error=err[0].json.get("error")
+            error=err
         )
 
     ok, err = validate_enum("water_requirement", water_requirement, ALLOWED_WATER)
@@ -871,7 +871,7 @@ def create_plant():
             'neue_pflanze.html',
             username=session['username'],
             locations=locations,
-            error=err[0].json.get("error")
+            error=err
         )
 
     ok, err = validate_enum("temperature_requirement", temperature_requirement, ALLOWED_TEMP)
@@ -880,7 +880,7 @@ def create_plant():
             'neue_pflanze.html',
             username=session['username'],
             locations=locations,
-            error=err[0].json.get("error")
+            error=err
         )
 
     ok, err = validate_enum("humidity_requirement", humidity_requirement, ALLOWED_HUMIDITY)
@@ -889,7 +889,7 @@ def create_plant():
             'neue_pflanze.html',
             username=session['username'],
             locations=locations,
-            error=err[0].json.get("error")
+            error=err
         )
 
     location_id, location_error = parse_location_id_from_form(user_id)
@@ -1025,7 +1025,7 @@ def update_plant_form(plant_id):
             username=session['username'],
             plant=build_plant_data(plant, user_id),
             locations=locations,
-            error=err[0].json.get("error")
+            error=err
         )
 
     ok, err = validate_enum("water_requirement", water_requirement, ALLOWED_WATER)
@@ -1035,7 +1035,7 @@ def update_plant_form(plant_id):
             username=session['username'],
             plant=build_plant_data(plant, user_id),
             locations=locations,
-            error=err[0].json.get("error")
+            error=err
         )
 
     ok, err = validate_enum("temperature_requirement", temperature_requirement, ALLOWED_TEMP)
@@ -1045,7 +1045,7 @@ def update_plant_form(plant_id):
             username=session['username'],
             plant=build_plant_data(plant, user_id),
             locations=locations,
-            error=err[0].json.get("error")
+            error=err
         )
 
     ok, err = validate_enum("humidity_requirement", humidity_requirement, ALLOWED_HUMIDITY)
@@ -1055,7 +1055,7 @@ def update_plant_form(plant_id):
             username=session['username'],
             plant=build_plant_data(plant, user_id),
             locations=locations,
-            error=err[0].json.get("error")
+            error=err
         )
 
     location_id, location_error = parse_location_id_from_form(user_id)
@@ -2295,7 +2295,7 @@ def update_location(location_id):
             'aendern_standort.html',
             username=session['username'],
             location=location_data,
-            error=err[0].json.get("error")
+            error=err
         )
 
     ok, err = validate_enum("temperature", temperature, ALLOWED_TEMP)
@@ -2304,7 +2304,7 @@ def update_location(location_id):
             'aendern_standort.html',
             username=session['username'],
             location=location_data,
-            error=err[0].json.get("error")
+            error=err
         )
 
     ok, err = validate_enum("humidity", humidity, ALLOWED_HUMIDITY)
@@ -2313,7 +2313,7 @@ def update_location(location_id):
             'aendern_standort.html',
             username=session['username'],
             location=location_data,
-            error=err[0].json.get("error")
+            error=err
         )
 
     try:
