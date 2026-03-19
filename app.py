@@ -232,6 +232,76 @@ def require_login():
         return None, (jsonify({"error": "Nicht eingeloggt"}), 401)
     return user_id, None
 
+def get_logged_in_user_id():
+    '''
+    Liefert die user_id aus der Session für HTML-Seiten
+    Gibt None zurück, wenn niemand eingeloggt ist
+    '''
+    return session.get('user_id')
+
+
+def get_user_locations(user_id):
+    '''
+    Lädt alle Standorte des Users, absteigend nach Erstellzeit
+    '''
+    return Location.query.filter_by(user_id=user_id).order_by(Location.name.asc()).all()
+
+
+def get_selected_location(user_id):
+    '''
+    Liest location_id aus der URL (?location_id=...)
+    und liefert das passende Location-Objekt oder None
+    '''
+    location_id = request.args.get('location_id', type=int)
+
+    if location_id is None:
+        return None
+
+    return Location.query.filter_by(id=location_id, user_id=user_id).first()
+
+
+def get_location_name_map(user_id):
+    '''
+    Baut ein Dictionary:
+    {location_id: location_name}
+    '''
+    locations = get_user_locations(user_id)
+    return {loc.id: loc.name for loc in locations}
+
+
+def add_location_name_to_plants(plants, user_id):
+    '''
+    Wandelt Pflanzenobjekte in Dictionaries um
+    und ergänzt location_name
+    '''
+    location_map = get_location_name_map(user_id)
+
+    result = []
+    for p in plants:
+        result.append({
+            "id": p.id,
+            "name": p.name,
+            "botanical_name": p.botanical_name,
+            "light_requirement": p.light_requirement,
+            "water_requirement": p.water_requirement,
+            "temperature_requirement": p.temperature_requirement,
+            "humidity_requirement": p.humidity_requirement,
+            "soil_type": p.soil_type,
+            "height_min": p.height_min,
+            "height_max": p.height_max,
+            "poisonous": bool(p.poisonous),
+            "flowering_season_start": p.flowering_season_start,
+            "flowering_season_end": p.flowering_season_end,
+            "flower_color": p.flower_color,
+            "notes": p.notes,
+            "is_purchased": bool(p.is_purchased),
+            "location_id": p.location_id,
+            "location_name": location_map.get(p.location_id),
+            "created_at": str(p.created_at)
+        })
+
+    return result
+
 # Validierung der Enum-Felder
 
 ALLOWED_LIGHT = {"schatten", "halbschatten", "sonnig"}
@@ -507,22 +577,62 @@ def logout():
 def wishlist_page():
     '''
     HTML-Seite für die Wunschliste anzeigen
+    Optional nach Standort filterbar über ?location_id=
     '''
     if 'username' not in session:
         return redirect(url_for('auth'))
 
-    return render_template('wunschliste.html', username=session['username'])
+    user_id = get_logged_in_user_id()
+    locations = get_user_locations(user_id)
+    selected_location = get_selected_location(user_id)
+
+    query = Plant.query.filter_by(user_id=user_id, is_purchased=False)
+
+    if selected_location is not None:
+        query = query.filter_by(location_id=selected_location.id)
+
+    plants = query.order_by(Plant.created_at.desc()).all()
+    plants_data = add_location_name_to_plants(plants, user_id)
+
+    return render_template(
+        'wunschliste.html',
+        username=session['username'],
+        locations=locations,
+        plants=plants_data,
+        selected_location_id=selected_location.id if selected_location else None,
+        error=None
+    )
 
 
 @app.route('/inventory', methods=['GET'])
 def inventory_page():
     '''
     HTML-Seite für den Bestand anzeigen
+    Optional nach Standort filterbar über ?location_id=
     '''
     if 'username' not in session:
         return redirect(url_for('auth'))
 
-    return render_template('bestand.html', username=session['username'])
+    user_id = get_logged_in_user_id()
+    locations = get_user_locations(user_id)
+    selected_location = get_selected_location(user_id)
+
+    query = Plant.query.filter_by(user_id=user_id, is_purchased=True)
+
+    if selected_location is not None:
+        query = query.filter_by(location_id=selected_location.id)
+
+    plants = query.order_by(Plant.created_at.desc()).all()
+    plants_data = add_location_name_to_plants(plants, user_id)
+
+    return render_template(
+        'bestand.html',
+        username=session['username'],
+        locations=locations,
+        plants=plants_data,
+        selected_location_id=selected_location.id if selected_location else None,
+        error=None
+    )
 
 
 @app.route('/locations', methods=['GET'])
@@ -534,20 +644,6 @@ def locations_page():
         return redirect(url_for('auth'))
 
     return render_template('standorte.html', username=session['username'])
-
-
-@app.route('/plants', methods=['GET'])
-def plants_page():
-    '''
-    HTML-Seite für die Gesamtübersicht aller Pflanzen anzeigen
-    '''
-    if 'username' not in session:
-        return redirect(url_for('auth'))
-
-    return render_template(
-        'liste_von_pflanzen.html',
-        username=session['username']
-    )
 
 @app.route('/locations/<int:location_id>/plants', methods=['GET'])
 def location_plants_page(location_id):
@@ -561,6 +657,106 @@ def location_plants_page(location_id):
         'liste_von_pflanzen.html',
         username=session['username'],
         location_id=location_id
+    )
+
+@app.route('/plants', methods=['GET'])
+def plants_page():
+    '''
+    HTML-Seite für Pflanzenempfehlungen anzeigen
+    Optional nach Standort filterbar über ?location_id=
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    user_id = get_logged_in_user_id()
+    locations = get_user_locations(user_id)
+    selected_location = get_selected_location(user_id)
+
+    all_user_plants = Plant.query.filter_by(user_id=user_id).all()
+    owned_plant_keys = {get_plant_identity(p) for p in all_user_plants}
+
+    inventory_plants = Plant.query.filter_by(user_id=user_id, is_purchased=True).all()
+
+    if selected_location is not None:
+        inventory_plants_for_bonus = Plant.query.filter_by(
+            user_id=user_id,
+            is_purchased=True,
+            location_id=selected_location.id
+        ).all()
+    else:
+        inventory_plants_for_bonus = inventory_plants
+
+    catalog_plants = PlantCatalog.query.order_by(PlantCatalog.name.asc()).all()
+
+    recommendations = []
+
+    for catalog_plant in catalog_plants:
+        if get_plant_identity(catalog_plant) in owned_plant_keys:
+            continue
+
+        suitability = None
+        checks = []
+
+        if selected_location is not None:
+            suitability_result = check_plant_location_suitability(catalog_plant, selected_location)
+
+            if suitability_result["suitability"] not in ["geeignet", "bedingt geeignet"]:
+                continue
+
+            suitability = suitability_result["suitability"]
+            checks = suitability_result["checks"]
+
+        aesthetic_bonus, aesthetic_reasons = calculate_aesthetic_bonus(
+            catalog_plant,
+            inventory_plants_for_bonus
+        )
+
+        recommendations.append({
+            "id": catalog_plant.id,
+            "name": catalog_plant.name,
+            "botanical_name": catalog_plant.botanical_name,
+            "light_requirement": catalog_plant.light_requirement,
+            "water_requirement": catalog_plant.water_requirement,
+            "temperature_requirement": catalog_plant.temperature_requirement,
+            "humidity_requirement": catalog_plant.humidity_requirement,
+            "soil_type": catalog_plant.soil_type,
+            "height_min": catalog_plant.height_min,
+            "height_max": catalog_plant.height_max,
+            "poisonous": bool(catalog_plant.poisonous),
+            "flowering_season_start": catalog_plant.flowering_season_start,
+            "flowering_season_end": catalog_plant.flowering_season_end,
+            "flower_color": catalog_plant.flower_color,
+            "notes": None,
+            "location_id": selected_location.id if selected_location else None,
+            "location_name": selected_location.name if selected_location else None,
+            "suitability": suitability,
+            "checks": checks,
+            "aesthetic_bonus": aesthetic_bonus,
+            "aesthetic_reasons": aesthetic_reasons,
+            "created_at": str(catalog_plant.created_at)
+        })
+
+    suitability_order = {
+        "geeignet": 0,
+        "bedingt geeignet": 1,
+        None: 2
+    }
+
+    recommendations.sort(
+        key=lambda r: (
+            suitability_order.get(r["suitability"], 99),
+            -r["aesthetic_bonus"],
+            r["name"].lower()
+        )
+    )
+
+    return render_template(
+        'liste_von_pflanzen.html',
+        username=session['username'],
+        locations=locations,
+        plants=recommendations,
+        selected_location_id=selected_location.id if selected_location else None,
+        error=None
     )
 
 

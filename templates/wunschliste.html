@@ -39,7 +39,7 @@
                     </a>
                     {% for location in locations %}
                     <br>
-                    <a href="/inventory/{{ location.id }}">
+                    <a href="/wishlist?location_id={{ location.id }}">
                         <button class="location_button">{{ location.name }}</button>
                     </a>
                     {% endfor %}<!-- URL Geben -->
@@ -87,7 +87,7 @@
                             <td>{{ p.flower_color }}</td>
                             <td>{{ p.notes }}</td>
                             <td>
-                                <a href="/plants/{{pflanze.id}}/edit">Pflanze bearbeiten</a>
+                                <a href="/plants/{{p.id}}/edit">Pflanze bearbeiten</a>
                                 <a href="">Pflanze löschen</a> <!-- URL Geben -->
                                 <a href="">Pflanze zu Bestand hinzufügen</a> <!-- URL Geben -->
                             </td>
