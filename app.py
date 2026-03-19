@@ -1719,6 +1719,60 @@ def update_plant(plant_id):
         return jsonify({"error": f"Fehler beim Aktualisieren: {str(e)}"}), 400
 
 
+@app.route('/locations/<int:location_id>/update', methods=['POST'])
+def update_location(location_id):
+    '''
+    Standort bearbeiten und speichern
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    user_id = session['user_id']
+
+    location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    if not location:
+        return render_template(
+            'aendern_standort.html',
+            username=session['username'],
+            location=None,
+            error="Standort nicht gefunden"
+        )
+
+    # Form-Daten holen
+    name = request.form.get('name')
+    lighting_condition = request.form.get('lighting_condition')
+    temperature = request.form.get('temperature')
+    humidity = request.form.get('humidity')
+    description = request.form.get('description')
+
+    if not name:
+        return render_template(
+            'aendern_standort.html',
+            username=session['username'],
+            location=location,
+            error="Name darf nicht leer sein"
+        )
+
+    try:
+        location.name = name
+        location.lighting_condition = lighting_condition
+        location.temperature = temperature
+        location.humidity = humidity
+        location.description = description
+
+        db.session.commit()
+
+        return redirect(url_for('locations_page'))
+
+    except Exception as e:
+        db.session.rollback()
+        return render_template(
+            'aendern_standort.html',
+            username=session['username'],
+            location=location,
+            error=f"Fehler beim Speichern: {str(e)}"
+        )
+
 # App starten
 if __name__ == '__main__':
     app.run(debug=True)
