@@ -803,83 +803,7 @@ def plants_page():
     locations = get_user_locations(user_id)
     selected_location = get_selected_location(user_id)
 
-    all_user_plants = Plant.query.filter_by(user_id=user_id).all()
-    owned_plant_keys = {get_plant_identity(p) for p in all_user_plants}
-
-    inventory_plants = Plant.query.filter_by(user_id=user_id, is_purchased=True).all()
-
-    if selected_location is not None:
-        inventory_plants_for_bonus = Plant.query.filter_by(
-            user_id=user_id,
-            is_purchased=True,
-            location_id=selected_location.id
-        ).all()
-    else:
-        inventory_plants_for_bonus = inventory_plants
-
-    catalog_plants = PlantCatalog.query.order_by(PlantCatalog.name.asc()).all()
-
-    recommendations = []
-
-    for catalog_plant in catalog_plants:
-        if get_plant_identity(catalog_plant) in owned_plant_keys:
-            continue
-
-        suitability = None
-        checks = []
-
-        if selected_location is not None:
-            suitability_result = check_plant_location_suitability(catalog_plant, selected_location)
-
-            if suitability_result["suitability"] not in ["geeignet", "bedingt geeignet"]:
-                continue
-
-            suitability = suitability_result["suitability"]
-            checks = suitability_result["checks"]
-
-        aesthetic_bonus, aesthetic_reasons = calculate_aesthetic_bonus(
-            catalog_plant,
-            inventory_plants_for_bonus
-        )
-
-        recommendations.append({
-            "id": catalog_plant.id,
-            "name": catalog_plant.name,
-            "botanical_name": catalog_plant.botanical_name,
-            "light_requirement": catalog_plant.light_requirement,
-            "water_requirement": catalog_plant.water_requirement,
-            "temperature_requirement": catalog_plant.temperature_requirement,
-            "humidity_requirement": catalog_plant.humidity_requirement,
-            "soil_type": catalog_plant.soil_type,
-            "height_min": catalog_plant.height_min,
-            "height_max": catalog_plant.height_max,
-            "poisonous": bool(catalog_plant.poisonous),
-            "flowering_season_start": catalog_plant.flowering_season_start,
-            "flowering_season_end": catalog_plant.flowering_season_end,
-            "flower_color": catalog_plant.flower_color,
-            "notes": None,
-            "location_id": selected_location.id if selected_location else None,
-            "location_name": selected_location.name if selected_location else None,
-            "suitability": suitability,
-            "checks": checks,
-            "aesthetic_bonus": aesthetic_bonus,
-            "aesthetic_reasons": aesthetic_reasons,
-            "created_at": str(catalog_plant.created_at)
-        })
-
-    suitability_order = {
-        "geeignet": 0,
-        "bedingt geeignet": 1,
-        None: 2
-    }
-
-    recommendations.sort(
-        key=lambda r: (
-            suitability_order.get(r["suitability"], 99),
-            -r["aesthetic_bonus"],
-            r["name"].lower()
-        )
-    )
+    recommendations = build_recommendations(user_id, selected_location)
 
     return render_template(
         'liste_von_pflanzen.html',
@@ -902,11 +826,11 @@ def new_plant_page():
     locations = get_user_locations(session['user_id'])
 
     return render_template(
-    'neue_pflanze.html',
-    username=session['username'],
-    locations=locations,
-    error=None
-)
+        'neue_pflanze.html',
+        username=session['username'],
+        locations=locations,
+        error=None
+    )
 
 @app.route('/plants/create', methods=['POST'])
 def create_plant():
@@ -1343,7 +1267,7 @@ def add_wishlist_item():
 
     ok, err = validate_enum("water_requirement", data.get("water_requirement"), ALLOWED_WATER)
     if not ok:
-        return err
+        return jsonify({"error": err}), 400
 
     ok, err = validate_enum("humidity_requirement", data.get("humidity_requirement"), ALLOWED_HUMIDITY)
     if not ok:
@@ -1471,80 +1395,7 @@ def add_catalog_plant_to_wishlist(catalog_plant_id):
     if get_plant_identity(catalog_plant) in existing_keys:
         locations = get_user_locations(user_id)
         selected_location = get_selected_location(user_id)
-
-        all_user_plants = Plant.query.filter_by(user_id=user_id).all()
-        owned_plant_keys = {get_plant_identity(p) for p in all_user_plants}
-        inventory_plants = Plant.query.filter_by(user_id=user_id, is_purchased=True).all()
-
-        if selected_location is not None:
-            inventory_plants_for_bonus = Plant.query.filter_by(
-                user_id=user_id,
-                is_purchased=True,
-                location_id=selected_location.id
-            ).all()
-        else:
-            inventory_plants_for_bonus = inventory_plants
-
-        catalog_plants = PlantCatalog.query.order_by(PlantCatalog.name.asc()).all()
-        recommendations = []
-
-        for cp in catalog_plants:
-            if get_plant_identity(cp) in owned_plant_keys:
-                continue
-
-            suitability = None
-            checks = []
-
-            if selected_location is not None:
-                suitability_result = check_plant_location_suitability(cp, selected_location)
-                if suitability_result["suitability"] not in ["geeignet", "bedingt geeignet"]:
-                    continue
-                suitability = suitability_result["suitability"]
-                checks = suitability_result["checks"]
-
-            aesthetic_bonus, aesthetic_reasons = calculate_aesthetic_bonus(
-                cp,
-                inventory_plants_for_bonus
-            )
-
-            recommendations.append({
-                "id": cp.id,
-                "name": cp.name,
-                "botanical_name": cp.botanical_name,
-                "light_requirement": cp.light_requirement,
-                "water_requirement": cp.water_requirement,
-                "temperature_requirement": cp.temperature_requirement,
-                "humidity_requirement": cp.humidity_requirement,
-                "soil_type": cp.soil_type,
-                "height_min": cp.height_min,
-                "height_max": cp.height_max,
-                "poisonous": bool(cp.poisonous),
-                "flowering_season_start": cp.flowering_season_start,
-                "flowering_season_end": cp.flowering_season_end,
-                "flower_color": cp.flower_color,
-                "notes": None,
-                "location_id": selected_location.id if selected_location else None,
-                "location_name": selected_location.name if selected_location else None,
-                "suitability": suitability,
-                "checks": checks,
-                "aesthetic_bonus": aesthetic_bonus,
-                "aesthetic_reasons": aesthetic_reasons,
-                "created_at": str(cp.created_at)
-            })
-
-        suitability_order = {
-            "geeignet": 0,
-            "bedingt geeignet": 1,
-            None: 2
-        }
-
-        recommendations.sort(
-            key=lambda r: (
-                suitability_order.get(r["suitability"], 99),
-                -r["aesthetic_bonus"],
-                r["name"].lower()
-            )
-        )
+        recommendations = build_recommendations(user_id, selected_location)
 
         return render_template(
             'liste_von_pflanzen.html',
@@ -1854,102 +1705,26 @@ def recommend_plants_for_location(location_id):
         "recommendations": recommendations
     }), 200
 
-@app.route('/api/recommendations', methods=['GET'])  
-def list_recommendations():  
-    '''  
-    Gibt Pflanzen aus dem PlantCatalog zurück,  
+@app.route('/api/recommendations', methods=['GET'])
+def list_recommendations():
+    '''
+    Gibt Pflanzen aus dem PlantCatalog zurück,
     die noch nicht in Wunschliste oder Bestand des Users vorhanden sind
-    '''  
-    user_id, err = require_login()  
-    if err:  
-        return err  
+    '''
+    user_id, err = require_login()
+    if err:
+        return err
 
-    location_id = request.args.get("location_id", type=int)  
+    location_id = request.args.get("location_id", type=int)
 
-    selected_location = None  
-    if location_id is not None:  
-        selected_location = Location.query.filter_by(id=location_id, user_id=user_id).first()  
-        if not selected_location:  
-            return jsonify({"error": "Standort nicht gefunden"}), 404  
+    selected_location = None
+    if location_id is not None:
+        selected_location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+        if not selected_location:
+            return jsonify({"error": "Standort nicht gefunden"}), 404
 
-    all_user_plants = Plant.query.filter_by(user_id=user_id).all()  
-    owned_plant_keys = {get_plant_identity(p) for p in all_user_plants}  
-
-    inventory_plants = Plant.query.filter_by(user_id=user_id, is_purchased=True).all()  
-
-    if selected_location is not None:  
-        inventory_plants_for_bonus = Plant.query.filter_by(  
-            user_id=user_id,  
-            is_purchased=True,  
-            location_id=location_id  
-        ).all()  
-    else:  
-        inventory_plants_for_bonus = inventory_plants  
-
-    catalog_plants = PlantCatalog.query.order_by(PlantCatalog.name.asc()).all()  
-
-    recommendations = []  
-
-    for catalog_plant in catalog_plants:  
-        if get_plant_identity(catalog_plant) in owned_plant_keys:  
-            continue  
-
-        suitability = None  
-        checks = []  
-
-        if selected_location is not None:  
-            suitability_result = check_plant_location_suitability(catalog_plant, selected_location)  
-
-            if suitability_result["suitability"] not in ["geeignet", "bedingt geeignet"]:  
-                continue  
-
-            suitability = suitability_result["suitability"]  
-            checks = suitability_result["checks"]  
-
-        aesthetic_bonus, aesthetic_reasons = calculate_aesthetic_bonus(  
-            catalog_plant,  
-            inventory_plants_for_bonus  
-        )  
-
-        recommendations.append({  
-            "id": catalog_plant.id,  
-            "name": catalog_plant.name,  
-            "botanical_name": catalog_plant.botanical_name,  
-            "light_requirement": catalog_plant.light_requirement,  
-            "water_requirement": catalog_plant.water_requirement,  
-            "temperature_requirement": catalog_plant.temperature_requirement,  
-            "humidity_requirement": catalog_plant.humidity_requirement,  
-            "soil_type": catalog_plant.soil_type,  
-            "height_min": catalog_plant.height_min,  
-            "height_max": catalog_plant.height_max,  
-            "poisonous": bool(catalog_plant.poisonous),  
-            "flowering_season_start": catalog_plant.flowering_season_start,  
-            "flowering_season_end": catalog_plant.flowering_season_end,  
-            "flower_color": catalog_plant.flower_color,  
-            "notes": None,  
-            "location_id": location_id if selected_location is not None else None,  
-            "suitability": suitability,  
-            "checks": checks,  
-            "aesthetic_bonus": aesthetic_bonus,  
-            "aesthetic_reasons": aesthetic_reasons,  
-            "created_at": str(catalog_plant.created_at)  
-        })  
-
-    suitability_order = {  
-        "geeignet": 0,  
-        "bedingt geeignet": 1,  
-        None: 2  
-    }  
-
-    recommendations.sort(  
-        key=lambda r: (  
-            suitability_order.get(r["suitability"], 99),  
-            -r["aesthetic_bonus"],  
-            r["name"].lower()  
-        )  
-    )  
-
-    return jsonify(recommendations), 200  
+    recommendations = build_recommendations(user_id, selected_location)
+    return jsonify(recommendations), 200
 
 @app.route('/api/inventory', methods=['GET'])
 def list_inventory():
@@ -2138,10 +1913,15 @@ def create_location_form():
 
     user_id = session['user_id']
 
-    name = request.form.get('name')
+    name = (request.form.get('name') or "").strip()
+    lighting_condition = request.form.get('lighting_condition')
+    temperature = request.form.get('temperature')
+    humidity = request.form.get('humidity')
+    description = request.form.get('description')
+
+    locations = get_user_locations(user_id)
 
     if not name:
-        locations = get_user_locations(user_id)
         return render_template(
             'standorte.html',
             username=session['username'],
@@ -2149,10 +1929,41 @@ def create_location_form():
             error="Name darf nicht leer sein"
         )
 
+    ok, err = validate_enum("lighting_condition", lighting_condition, ALLOWED_LIGHT)
+    if not ok:
+        return render_template(
+            'standorte.html',
+            username=session['username'],
+            locations=locations,
+            error=err
+        )
+
+    ok, err = validate_enum("temperature", temperature, ALLOWED_TEMP)
+    if not ok:
+        return render_template(
+            'standorte.html',
+            username=session['username'],
+            locations=locations,
+            error=err
+        )
+
+    ok, err = validate_enum("humidity", humidity, ALLOWED_HUMIDITY)
+    if not ok:
+        return render_template(
+            'standorte.html',
+            username=session['username'],
+            locations=locations,
+            error=err
+        )
+
     try:
         new_location = Location(
             name=name,
-            user_id=user_id
+            user_id=user_id,
+            lighting_condition=lighting_condition or None,
+            temperature=temperature or None,
+            humidity=humidity or None,
+            description=description
         )
 
         db.session.add(new_location)
@@ -2162,7 +1973,6 @@ def create_location_form():
 
     except Exception as e:
         db.session.rollback()
-        locations = get_user_locations(user_id)
         return render_template(
             'standorte.html',
             username=session['username'],
