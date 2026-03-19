@@ -786,7 +786,12 @@ def new_plant_page():
     
     locations = Location.query.filter_by(user_id=session['user_id']).order_by(Location.created_at.desc()).all()
 
-    return render_template('neue_pflanze.html', username=session['username'], locations=locations)
+    return render_template(
+    'neue_pflanze.html',
+    username=session['username'],
+    locations=locations,
+    error=None
+)
 
 @app.route('/plants/create', methods=['POST'])
 def create_plant():
