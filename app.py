@@ -363,21 +363,18 @@ ALLOWED_WATER = {"wenig", "mittel", "viel"}
 
 def validate_enum(field_name, value, allowed_values):
     '''
-    Prüft ob ein Wert in einer erlaubten Menge liegt
+    Prüft, ob ein Wert in einer erlaubten Menge liegt.
     - None oder "" wird als "nicht gesetzt" akzeptiert
     '''
     if value is None:
         return True, None
 
-    # Falls Frontend mal "" schickt, behandeln wir es als None
     if isinstance(value, str) and value.strip() == "":
         return True, None
 
     if value not in allowed_values:
-        return False, (jsonify({
-            "error": f"Ungültiger Wert für {field_name}: '{value}'",
-            "allowed": sorted(list(allowed_values))
-        }), 400)
+        allowed_text = ", ".join(sorted(allowed_values))
+        return False, f"Ungültiger Wert für {field_name}: '{value}'. Erlaubt sind: {allowed_text}"
 
     return True, None
 
