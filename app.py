@@ -1351,6 +1351,41 @@ def remove_wishlist_item(plant_id):
         db.session.rollback()
         return jsonify({"error": f"Fehler beim Entfernen: {str(e)}"}), 400
 
+@app.route('/plants/<int:plant_id>/move-to-inventory', methods=['POST'])
+def move_plant_to_inventory(plant_id):
+    '''
+    Pflanze von Wunschliste in Bestand verschieben
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    user_id = session['user_id']
+
+    plant = Plant.query.filter_by(id=plant_id, user_id=user_id, is_purchased=False).first()
+    if not plant:
+        return redirect(url_for('wishlist_page'))
+
+    try:
+        plant.is_purchased = True
+        db.session.commit()
+        return redirect(url_for('inventory_page'))
+
+    except Exception:
+        db.session.rollback()
+
+        locations = get_user_locations(user_id)
+        query = Plant.query.filter_by(user_id=user_id, is_purchased=False)
+        plants = query.order_by(Plant.created_at.desc()).all()
+        plants_data = add_location_name_to_plants(plants, user_id)
+
+        return render_template(
+            'wunschliste.html',
+            username=session['username'],
+            locations=locations,
+            plants=plants_data,
+            selected_location_id=None,
+            error="Fehler beim Verschieben in den Bestand."
+        )
 
 @app.route('/api/locations', methods=['GET'])
 def list_locations():
