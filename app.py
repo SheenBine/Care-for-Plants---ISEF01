@@ -2221,7 +2221,7 @@ def update_plant(plant_id):
         return jsonify({"error": f"Fehler beim Aktualisieren: {str(e)}"}), 400
 
 @app.route('/locations/create', methods=['POST'])
-def create_location():
+def create_location_form():
     '''
     neuen Standort anlegen
     '''
