@@ -2281,7 +2281,15 @@ def update_location(location_id):
             error="Standort nicht gefunden"
         )
 
-    # Form-Daten holen
+    location_data = {
+    "id": location.id,
+    "name": location.name,
+    "lighting_condition": location.lighting_condition,
+    "temperature": location.temperature,
+    "humidity": location.humidity,
+    "description": location.description
+    
+    }   
     name = request.form.get('name')
     lighting_condition = request.form.get('lighting_condition')
     temperature = request.form.get('temperature')
@@ -2292,7 +2300,7 @@ def update_location(location_id):
         return render_template(
             'aendern_standort.html',
             username=session['username'],
-            location=location,
+            location=location_data,
             error="Name darf nicht leer sein"
         )
 
@@ -2312,7 +2320,7 @@ def update_location(location_id):
         return render_template(
             'aendern_standort.html',
             username=session['username'],
-            location=location,
+            location=location_data,
             error=f"Fehler beim Speichern: {str(e)}"
         )
 
