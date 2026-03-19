@@ -2269,20 +2269,20 @@ def update_location(location_id):
             error="Standort nicht gefunden"
         )
 
-    location_data = {
-    "id": location.id,
-    "name": location.name,
-    "lighting_condition": location.lighting_condition,
-    "temperature": location.temperature,
-    "humidity": location.humidity,
-    "description": location.description
-    
-    }   
     name = request.form.get('name')
     lighting_condition = request.form.get('lighting_condition')
     temperature = request.form.get('temperature')
     humidity = request.form.get('humidity')
     description = request.form.get('description')
+
+    location_data = {
+        "id": location.id,
+        "name": name,
+        "lighting_condition": lighting_condition,
+        "temperature": temperature,
+        "humidity": humidity,
+        "description": description
+    }
 
     if not name:
         return render_template(
@@ -2292,11 +2292,38 @@ def update_location(location_id):
             error="Name darf nicht leer sein"
         )
 
+    ok, err = validate_enum("lighting_condition", lighting_condition, ALLOWED_LIGHT)
+    if not ok:
+        return render_template(
+            'aendern_standort.html',
+            username=session['username'],
+            location=location_data,
+            error=err[0].json.get("error")
+        )
+
+    ok, err = validate_enum("temperature", temperature, ALLOWED_TEMP)
+    if not ok:
+        return render_template(
+            'aendern_standort.html',
+            username=session['username'],
+            location=location_data,
+            error=err[0].json.get("error")
+        )
+
+    ok, err = validate_enum("humidity", humidity, ALLOWED_HUMIDITY)
+    if not ok:
+        return render_template(
+            'aendern_standort.html',
+            username=session['username'],
+            location=location_data,
+            error=err[0].json.get("error")
+        )
+
     try:
         location.name = name
-        location.lighting_condition = lighting_condition
-        location.temperature = temperature
-        location.humidity = humidity
+        location.lighting_condition = lighting_condition or None
+        location.temperature = temperature or None
+        location.humidity = humidity or None
         location.description = description
 
         db.session.commit()
@@ -2311,7 +2338,6 @@ def update_location(location_id):
             location=location_data,
             error=f"Fehler beim Speichern: {str(e)}"
         )
-
 # App starten
 if __name__ == '__main__':
     app.run(debug=True)
