@@ -1718,6 +1718,47 @@ def update_plant(plant_id):
         db.session.rollback()
         return jsonify({"error": f"Fehler beim Aktualisieren: {str(e)}"}), 400
 
+@app.route('/locations/create', methods=['POST'])
+def create_location():
+    '''
+    neuen Standort anlegen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    user_id = session['user_id']
+
+    name = request.form.get('name')
+
+    if not name:
+        locations = get_user_locations(user_id)
+        return render_template(
+            'standorte.html',
+            username=session['username'],
+            locations=locations,
+            error="Name darf nicht leer sein"
+        )
+
+    try:
+        new_location = Location(
+            name=name,
+            user_id=user_id
+        )
+
+        db.session.add(new_location)
+        db.session.commit()
+
+        return redirect(url_for('locations_page'))
+
+    except Exception as e:
+        db.session.rollback()
+        locations = get_user_locations(user_id)
+        return render_template(
+            'standorte.html',
+            username=session['username'],
+            locations=locations,
+            error=f"Fehler beim Erstellen: {str(e)}"
+        )
 
 @app.route('/locations/<int:location_id>/update', methods=['POST'])
 def update_location(location_id):
