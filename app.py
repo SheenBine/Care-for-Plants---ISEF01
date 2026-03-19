@@ -674,19 +674,6 @@ def locations_page():
         error=None
     )
 
-@app.route('/locations/<int:location_id>/plants', methods=['GET'])
-def location_plants_page(location_id):
-    '''
-    HTML-Seite für Pflanzen eines Standorts anzeigen
-    '''
-    if 'username' not in session:
-        return redirect(url_for('auth'))
-
-    return render_template(
-        'liste_von_pflanzen.html',
-        username=session['username'],
-        location_id=location_id
-    )
 
 @app.route('/plants', methods=['GET'])
 def plants_page():
