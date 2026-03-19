@@ -40,7 +40,7 @@
                     </a>
                     {% for location in locations %}
                     <br>
-                    <a href="/inventory/{{ location.id }}">
+                    <a href="/inventory?location_id={{ location.id }}">
                         <button class="location_button">{{ location.name }}</button>
                     </a>
                     <!-- URL Geben -->
