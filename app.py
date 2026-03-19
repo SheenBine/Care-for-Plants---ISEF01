@@ -302,6 +302,27 @@ def add_location_name_to_plants(plants, user_id):
 
     return result
 
+def parse_location_id_from_form(user_id):
+    '''
+    Liest location_id aus request.form
+    Leerer Wert bedeutet: kein Standort
+    '''
+    raw_location_id = request.form.get('location_id')
+
+    if raw_location_id is None or raw_location_id == "":
+        return None, None
+
+    try:
+        location_id = int(raw_location_id)
+    except ValueError:
+        return None, "Ungültige Standort-ID"
+
+    location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    if not location:
+        return None, "Standort ungültig"
+
+    return location_id, None
+
 # Validierung der Enum-Felder
 
 ALLOWED_LIGHT = {"schatten", "halbschatten", "sonnig"}
@@ -780,6 +801,122 @@ def new_plant_page():
 
     return render_template('neue_pflanze.html', username=session['username'], locations=locations)
 
+@app.route('/plants/create', methods=['POST'])
+def create_plant():
+    '''
+    Neue Pflanze anlegen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    user_id = session['user_id']
+    locations = get_user_locations(user_id)
+
+    name = (request.form.get('name') or "").strip()
+    botanical_name = request.form.get('botanical_name')
+    light_requirement = request.form.get('light_requirement')
+    water_requirement = request.form.get('water_requirement')
+    temperature_requirement = request.form.get('temperature_requirement')
+    humidity_requirement = request.form.get('humidity_requirement')
+    soil_type = request.form.get('soil_type')
+    height_min = request.form.get('height_min') or None
+    height_max = request.form.get('height_max') or None
+    flower_color = request.form.get('flower_color')
+    flowering_season_start = request.form.get('flowering_season_start') or None
+    flowering_season_end = request.form.get('flowering_season_end') or None
+    notes = request.form.get('notes')
+    poisonous = request.form.get('poisonous') == 'on'
+    is_purchased = request.form.get('is_purchased') == 'on'
+
+    if not name:
+        return render_template(
+            'neue_pflanze.html',
+            username=session['username'],
+            locations=locations,
+            error="Bitte einen Namen eingeben."
+        )
+
+    ok, err = validate_enum("light_requirement", light_requirement, ALLOWED_LIGHT)
+    if not ok:
+        return render_template(
+            'neue_pflanze.html',
+            username=session['username'],
+            locations=locations,
+            error=err[0].json.get("error")
+        )
+
+    ok, err = validate_enum("water_requirement", water_requirement, ALLOWED_WATER)
+    if not ok:
+        return render_template(
+            'neue_pflanze.html',
+            username=session['username'],
+            locations=locations,
+            error=err[0].json.get("error")
+        )
+
+    ok, err = validate_enum("temperature_requirement", temperature_requirement, ALLOWED_TEMP)
+    if not ok:
+        return render_template(
+            'neue_pflanze.html',
+            username=session['username'],
+            locations=locations,
+            error=err[0].json.get("error")
+        )
+
+    ok, err = validate_enum("humidity_requirement", humidity_requirement, ALLOWED_HUMIDITY)
+    if not ok:
+        return render_template(
+            'neue_pflanze.html',
+            username=session['username'],
+            locations=locations,
+            error=err[0].json.get("error")
+        )
+
+    location_id, location_error = parse_location_id_from_form(user_id)
+    if location_error:
+        return render_template(
+            'neue_pflanze.html',
+            username=session['username'],
+            locations=locations,
+            error=location_error
+        )
+
+    try:
+        plant = Plant(
+            user_id=user_id,
+            name=name,
+            botanical_name=botanical_name,
+            light_requirement=light_requirement or None,
+            water_requirement=water_requirement or None,
+            temperature_requirement=temperature_requirement or None,
+            humidity_requirement=humidity_requirement or None,
+            soil_type=soil_type,
+            height_min=int(height_min) if height_min else None,
+            height_max=int(height_max) if height_max else None,
+            poisonous=poisonous,
+            flowering_season_start=int(flowering_season_start) if flowering_season_start else None,
+            flowering_season_end=int(flowering_season_end) if flowering_season_end else None,
+            flower_color=flower_color,
+            notes=notes,
+            is_purchased=is_purchased,
+            location_id=location_id
+        )
+
+        db.session.add(plant)
+        db.session.commit()
+
+        if is_purchased:
+            return redirect(url_for('inventory_page'))
+        return redirect(url_for('wishlist_page'))
+
+    except Exception as e:
+        db.session.rollback()
+        return render_template(
+            'neue_pflanze.html',
+            username=session['username'],
+            locations=locations,
+            error=f"Fehler beim Speichern: {str(e)}"
+        )
 
 @app.route('/plants/<int:plant_id>/edit', methods=['GET'])
 def edit_plant_page(plant_id):
@@ -838,6 +975,155 @@ def edit_plant_page(plant_id):
         error=None
     )
 
+@app.route('/plants/<int:plant_id>/update', methods=['POST'])
+def update_plant_form(plant_id):
+    '''
+    Pflanze über HTML-Formular bearbeiten und speichern
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    user_id = session['user_id']
+    locations = get_user_locations(user_id)
+
+    plant = Plant.query.filter_by(id=plant_id, user_id=user_id).first()
+    if not plant:
+        return render_template(
+            'aenderung.html',
+            username=session['username'],
+            plant=None,
+            locations=locations,
+            error="Pflanze nicht gefunden"
+        )
+
+    name = (request.form.get('name') or "").strip()
+    botanical_name = request.form.get('botanical_name')
+    light_requirement = request.form.get('light_requirement')
+    water_requirement = request.form.get('water_requirement')
+    temperature_requirement = request.form.get('temperature_requirement')
+    humidity_requirement = request.form.get('humidity_requirement')
+    soil_type = request.form.get('soil_type')
+    height_min = request.form.get('height_min') or None
+    height_max = request.form.get('height_max') or None
+    flower_color = request.form.get('flower_color')
+    flowering_season_start = request.form.get('flowering_season_start') or None
+    flowering_season_end = request.form.get('flowering_season_end') or None
+    notes = request.form.get('notes')
+    poisonous = request.form.get('poisonous') == 'on'
+    is_purchased = request.form.get('is_purchased') == 'on'
+
+    if not name:
+        plant_data = {
+            "id": plant.id,
+            "name": plant.name,
+            "botanical_name": plant.botanical_name,
+            "light_requirement": plant.light_requirement,
+            "water_requirement": plant.water_requirement,
+            "temperature_requirement": plant.temperature_requirement,
+            "humidity_requirement": plant.humidity_requirement,
+            "soil_type": plant.soil_type,
+            "height_min": plant.height_min,
+            "height_max": plant.height_max,
+            "poisonous": bool(plant.poisonous),
+            "flowering_season_start": plant.flowering_season_start,
+            "flowering_season_end": plant.flowering_season_end,
+            "flower_color": plant.flower_color,
+            "notes": plant.notes,
+            "is_purchased": bool(plant.is_purchased),
+            "location_id": plant.location_id
+        }
+
+        return render_template(
+            'aenderung.html',
+            username=session['username'],
+            plant=plant_data,
+            locations=locations,
+            error="Bitte einen Namen eingeben."
+        )
+
+    ok, err = validate_enum("light_requirement", light_requirement, ALLOWED_LIGHT)
+    if not ok:
+        return render_template(
+            'aenderung.html',
+            username=session['username'],
+            plant=plant,
+            locations=locations,
+            error=err[0].json.get("error")
+        )
+
+    ok, err = validate_enum("water_requirement", water_requirement, ALLOWED_WATER)
+    if not ok:
+        return render_template(
+            'aenderung.html',
+            username=session['username'],
+            plant=plant,
+            locations=locations,
+            error=err[0].json.get("error")
+        )
+
+    ok, err = validate_enum("temperature_requirement", temperature_requirement, ALLOWED_TEMP)
+    if not ok:
+        return render_template(
+            'aenderung.html',
+            username=session['username'],
+            plant=plant,
+            locations=locations,
+            error=err[0].json.get("error")
+        )
+
+    ok, err = validate_enum("humidity_requirement", humidity_requirement, ALLOWED_HUMIDITY)
+    if not ok:
+        return render_template(
+            'aenderung.html',
+            username=session['username'],
+            plant=plant,
+            locations=locations,
+            error=err[0].json.get("error")
+        )
+
+    location_id, location_error = parse_location_id_from_form(user_id)
+    if location_error:
+        return render_template(
+            'aenderung.html',
+            username=session['username'],
+            plant=plant,
+            locations=locations,
+            error=location_error
+        )
+
+    try:
+        plant.name = name
+        plant.botanical_name = botanical_name
+        plant.light_requirement = light_requirement or None
+        plant.water_requirement = water_requirement or None
+        plant.temperature_requirement = temperature_requirement or None
+        plant.humidity_requirement = humidity_requirement or None
+        plant.soil_type = soil_type
+        plant.height_min = int(height_min) if height_min else None
+        plant.height_max = int(height_max) if height_max else None
+        plant.poisonous = poisonous
+        plant.flowering_season_start = int(flowering_season_start) if flowering_season_start else None
+        plant.flowering_season_end = int(flowering_season_end) if flowering_season_end else None
+        plant.flower_color = flower_color
+        plant.notes = notes
+        plant.is_purchased = is_purchased
+        plant.location_id = location_id
+
+        db.session.commit()
+
+        if is_purchased:
+            return redirect(url_for('inventory_page'))
+        return redirect(url_for('wishlist_page'))
+
+    except Exception as e:
+        db.session.rollback()
+        return render_template(
+            'aenderung.html',
+            username=session['username'],
+            plant=plant,
+            locations=locations,
+            error=f"Fehler beim Speichern: {str(e)}"
+        )
 
 @app.route('/locations/<int:location_id>/edit', methods=['GET'])
 def edit_location_page(location_id):
