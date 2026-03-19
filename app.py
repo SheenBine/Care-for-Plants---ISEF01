@@ -302,6 +302,37 @@ def add_location_name_to_plants(plants, user_id):
 
     return result
 
+def build_plant_data(plant, user_id):
+    '''
+    Baut ein Dictionary für genau eine Pflanze
+    '''
+    location_name = None
+    if plant.location_id is not None:
+        location = Location.query.filter_by(id=plant.location_id, user_id=user_id).first()
+        if location:
+            location_name = location.name
+
+    return {
+        "id": plant.id,
+        "name": plant.name,
+        "botanical_name": plant.botanical_name,
+        "light_requirement": plant.light_requirement,
+        "water_requirement": plant.water_requirement,
+        "temperature_requirement": plant.temperature_requirement,
+        "humidity_requirement": plant.humidity_requirement,
+        "soil_type": plant.soil_type,
+        "height_min": plant.height_min,
+        "height_max": plant.height_max,
+        "poisonous": bool(plant.poisonous),
+        "flowering_season_start": plant.flowering_season_start,
+        "flowering_season_end": plant.flowering_season_end,
+        "flower_color": plant.flower_color,
+        "notes": plant.notes,
+        "is_purchased": bool(plant.is_purchased),
+        "location_id": plant.location_id,
+        "location_name": location_name
+    }
+
 def parse_location_id_from_form(user_id):
     '''
     Liest location_id aus request.form
