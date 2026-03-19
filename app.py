@@ -815,7 +815,7 @@ def new_plant_page():
     if 'username' not in session:
         return redirect(url_for('auth'))
     
-    locations = Location.query.filter_by(user_id=session['user_id']).order_by(Location.created_at.desc()).all()
+    locations = get_user_locations(session['user_id'])
 
     return render_template(
     'neue_pflanze.html',
@@ -962,12 +962,6 @@ def edit_plant_page(plant_id):
         )
 
     locations = get_user_locations(user_id)
-
-    location_name = None
-    if plant.location_id is not None:
-        location = Location.query.filter_by(id=plant.location_id, user_id=user_id).first()
-        if location:
-            location_name = location.name
 
     plant_data = build_plant_data(plant, user_id)
 
