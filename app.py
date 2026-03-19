@@ -1252,7 +1252,7 @@ def add_wishlist_item():
 
     ok, err = validate_enum("light_requirement", data.get("light_requirement"), ALLOWED_LIGHT)
     if not ok:
-        return err
+        return jsonify({"error": err}), 400
 
     ok, err = validate_enum("water_requirement", data.get("water_requirement"), ALLOWED_WATER)
     if not ok:
@@ -1260,11 +1260,11 @@ def add_wishlist_item():
 
     ok, err = validate_enum("humidity_requirement", data.get("humidity_requirement"), ALLOWED_HUMIDITY)
     if not ok:
-        return err
+        return jsonify({"error": err}), 400
 
     ok, err = validate_enum("temperature_requirement", data.get("temperature_requirement"), ALLOWED_TEMP)
     if not ok:
-        return err
+        return jsonify({"error": err}), 400
 
     location_id = data.get("location_id")
     if location_id is not None:
@@ -1539,15 +1539,15 @@ def create_location():
 
     ok, err = validate_enum("lighting_condition", data.get("lighting_condition"), ALLOWED_LIGHT)
     if not ok:
-        return err
+        return jsonify({"error": err}), 400
 
     ok, err = validate_enum("temperature", data.get("temperature"), ALLOWED_TEMP)
     if not ok:
-        return err
+        return jsonify({"error": err}), 400
 
     ok, err = validate_enum("humidity", data.get("humidity"), ALLOWED_HUMIDITY)
     if not ok:
-        return err
+        return jsonify({"error": err}), 400
 
     try:
         loc = Location(
@@ -2132,19 +2132,19 @@ def update_plant(plant_id):
     if "light_requirement" in data:
         ok, err = validate_enum("light_requirement", data.get("light_requirement"), ALLOWED_LIGHT)
         if not ok:
-            return err
+            return jsonify({"error": err}), 400
         plant.light_requirement = data.get("light_requirement")
 
     if "water_requirement" in data:
         ok, err = validate_enum("water_requirement", data.get("water_requirement"), ALLOWED_WATER)
         if not ok:
-            return err
+            return jsonify({"error": err}), 400
         plant.water_requirement = data.get("water_requirement")
 
     if "humidity_requirement" in data:
         ok, err = validate_enum("humidity_requirement", data.get("humidity_requirement"), ALLOWED_HUMIDITY)
         if not ok:
-            return err
+            return jsonify({"error": err}), 400
         plant.humidity_requirement = data.get("humidity_requirement")
 
     if "temperature_requirement" in data:
@@ -2152,7 +2152,7 @@ def update_plant(plant_id):
                                 data.get("temperature_requirement"),
                                 ALLOWED_TEMP)
         if not ok:
-            return err
+            return jsonify({"error": err}), 400
 
         plant.temperature_requirement = data.get("temperature_requirement")
 
