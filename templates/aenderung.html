@@ -33,7 +33,7 @@
         <!-- Content Bereich -->
         <div class="continer">
             <div class="row">
-                <form action="" method="POST">
+                <form action="/plants/{{plant.id}}/update" method="POST">
                 <!-- Tabelle mit Pflanzen -->
                     <div class="col-6">
                         <table>
@@ -101,7 +101,7 @@
                         </table>
                     </div>
                     <div class="col-6">
-                        <a href="/plants/{{plant.id}}/update"><button>Speichern</button></a> <!-- Klappt nicht -->
+                        <button type="submit">Speichern</button>
                     </div>
                 </form>
                 <a href="/"><button>Abbrechen</button></a>

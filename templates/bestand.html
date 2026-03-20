@@ -103,7 +103,9 @@
                             <td>{{ p.notes }}</td>
                             <td>
                                 <a href="/plants/{{p.id}}/edit"><button>Pflanze bearbeiten</button></a>
-                                <a href="/plants/{{p.id}}/delete"><button>Pflanze löschen</button></a> <!-- Klappt nicht -->
+                                <form action="/plants/{{p.id}}/delete" method="POST">
+                                    <button type="submit">Pflanze löschen</button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}

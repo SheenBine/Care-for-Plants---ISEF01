@@ -35,7 +35,7 @@
         <!-- Content Bereich -->
         <div class="continer">
             <div class="row">
-                <form action="" method="POST">
+                <form action="/locations/{{ location.id }}/update" method="POST">
                     <!-- Standort Ändern -->
                     <div class="col-6">
                         <table>
@@ -74,7 +74,7 @@
 
                     </div>
                     <div class="col-6">
-                        <a href="/locations/{{ location.id }}/update"><button>Speichern</button></a>
+                        <button type="submit">Speichern</button>
                     </div>
                 </form>
                 <a href="/"><button>Abbrechen</button></a>

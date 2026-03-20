@@ -44,7 +44,7 @@
                     </a>
                     {% for location in locations %}
                     <br>
-                    <a href="/plants?{{ location.id }}">
+                    <a href="/plants?location_id={{ location.id }}">
                         <button class="location_button">{{ location.name }}</button>
                     </a>
                     {% endfor %} <!-- URL Geben -->
@@ -90,7 +90,9 @@
                             <td>{{ p.flower_color }}</td>
                             <td>{{ p.notes }}</td>
                             <td>
-                                <a href="/catalog/{{p.id}}/add-to-wishlist"><button>Zur Wunschliste hinzufügen</button></a> <!-- Klappt der Filter --> <!-- Klappt nicht -->
+                                <form action="/catalog/{{p.id}}/add-to-wishlist" method="POST">
+                                    <button type="submit">Zur Wunschliste hunzufügen</button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}

@@ -41,7 +41,7 @@
         <div class="continer">
             <div class="row">
                 <!-- Neuer Standort -->
-                <form action="" method="POST">
+                <form action="/locations/create" method="POST">
                     <div class="col-6">
                         <table>
                             <thead>
@@ -78,7 +78,7 @@
                         </table>
                     </div>
                     <div class="col-6">
-                        <a href="/locations/create"><button>Speichern</button></a>
+                        <button type="submit">Speichern</button>
                     </div>
                 </form>
                 <a href="/"><button>Abbrechen</button></a>
@@ -105,8 +105,10 @@
                             <td>{{ loc.humidity }}</td>
                             <td>{{ loc.description }}</td>
                             <td>
-                                <a href="/locations/{{loc.id}}/edit">Standort bearbeiten</a>
-                                <a href="/api/locations/{{loc.id}}">Standort löschen</a>  <!-- Klappt? -->
+                                <a href="/locations/{{loc.id}}/edit"><button>Standort bearbeiten</button></a>
+                                <form action="/api/locations/{{loc.id}}" method="POST">
+                                    <button type="submit">Löschen</button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
