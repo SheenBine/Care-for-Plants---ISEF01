@@ -25,7 +25,9 @@
 
 
         <!-- !!! Fehlermendung Ausgeben !!! -->
-        <h2>{{ error }}</h2>
+        {% if error %}
+            <h2 class="print_error">{{ error }}</h2>
+        {% endif %}
 
 
         <!-- Content Bereich -->
@@ -33,73 +35,73 @@
             <div class="row">
                 <form action="" method="POST">
                 <!-- Tabelle mit Pflanzen -->
-                <div class="col-6">
-                    <table>
-                        <thead>
-                            <th>Name</th>
-                            <th>Standort</th>
-                            <th>Botanischer Name</th>
-                            <th>Benötigtes Licht</th>
-                            <th>Benötigtes Wasser</th>
-                            <th>Benötigte Temperatur</th>
-                            <th>Benötigte Feuchtigkeit</th>
-                            <th>Bodenart</th>
-                            <th>Minimale Höhe</th>
-                            <th>Maximale Höhe</th>
-                            <th>Giftig</th>
-                            <th>Blüte Anfang</th>
-                            <th>Büte Ende</th>
-                            <th>Pflanzenfarbe</th>
-                            <th>Notizen</th>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th><input name="name" placeholder="Name" value="{{ plant.name }}"></th>
-                                <th><select name="location" placeholder="Standort" value="{{ plant.location }}">
-                                    <option value=""></option>
-                                    {% for location in locations %}
-                                        <option value="{{ location.name }}">{{ location.name }}</option>
-                                    {% endfor %}
-                                </select></th>
-                                <th><input name="botanical_name" placeholder="Botanischer Name" value="{{ plant.botanical_name }}"></th>
-                                <th><select name="light_requirement" placeholder="Benötigtes Licht" value="{{ plant.light_requirement }}">
-                                    <option value=""></option>
-                                    <option value="schatten">Schatten</option>
-                                    <option value="halbschatten">Halbschatten</option>
-                                    <option value="sonnig">Sonnig</option>
-                                </select></th>
-                                <th><select name="water_requirement" placeholder="Benötigtes Wasser" value="{{ plant.water_requirement }}">
-                                    <option value=""></option>
-                                    <option value="wenig">Wenig</option>
-                                    <option value="mittel">Mittel</option>
-                                    <option value="viel">Viel</option>
-                                </select></th>
-                                <th><select name="temperature_requirement" placeholder="Benötigte Temperatur" value="{{ plant.temperature_requirement }}">
-                                    <option value=""></option>
-                                    <option value="kalt">Kalt</option>
-                                    <option value="normal">Normal</option>
-                                    <option value="warm">Warm</option>
-                                </select></th>
-                                <th><select name="humidity_requirement" placeholder="Benötigte Feuchtigkeit" value="{{ plant.humidity_requirement }}">
-                                    <option value=""></option>
-                                    <option value="trocken">Trocken</option>
-                                    <option value="normal">Normal</option>
-                                    <option value="feucht">Feucht</option>
-                                </select></th>
-                                <th><input name="soil_type" placeholder="Bodenart" value="{{ plant.soil_type }}"></th>
-                                <th><input type="number" min="0" step="1" name="height_min" placeholder="Minimale Höhe" value="{{ plant.height_min }}"></th>
-                                <th><input type="number" min="0" step="1" name="height_max" placeholder="Maximale Höhe" value="{{ plant.height_max }}"></th>
-                                <th><input type="checkbox" name="poisonous" placeholder="Giftig" {% if {{ plant.poisonous }} %} checked {% endif %}></th>
-                                <th><input type="number" min="0" max="12" step="1" name="flowering_season_start" placeholder="Blüte Anfang" value="{{ plant.flowering_season_start }}"></th>
-                                <th><input type="number" min="0" max="12" step="1" name="flowering_season_end" placeholder="Büte Ende" value="{{ plant.flowering_season_end }}"></th>
-                                <th><input name="flower_color" placeholder="BlumenFarbe" value="{{ plant.flower_color }}"></th>
-                                <th><input name="notes" placeholder="Notizen" value="{{ plant.notes }}"></th>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-6">
-                        <button type="submit" name="action" value="save">Speichern</button>
+                    <div class="col-6">
+                        <table>
+                            <thead>
+                                <th>Name</th>
+                                <th>Standort</th>
+                                <th>Botanischer Name</th>
+                                <th>Benötigtes Licht</th>
+                                <th>Benötigtes Wasser</th>
+                                <th>Benötigte Temperatur</th>
+                                <th>Benötigte Feuchtigkeit</th>
+                                <th>Bodenart</th>
+                                <th>Minimale Höhe</th>
+                                <th>Maximale Höhe</th>
+                                <th>Giftig</th>
+                                <th>Blüte Anfang</th>
+                                <th>Büte Ende</th>
+                                <th>Pflanzenfarbe</th>
+                                <th>Notizen</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th><input name="name" placeholder="Name" value="{{ plant.name }}"></th>
+                                    <th><select name="location" placeholder="Standort" value="{{ plant.location }}">
+                                        <option value=""></option>
+                                        {% for location in locations %}
+                                            <option value="{{ location.name }}" >{{ location.name }}</option> <!-- Muss ich noch machen-->
+                                        {% endfor %}
+                                    </select></th>
+                                    <th><input name="botanical_name" placeholder="Botanischer Name" value="{{ plant.botanical_name }}"></th>
+                                    <th><select name="light_requirement" placeholder="Benötigtes Licht" value="{{ plant.light_requirement }}">
+                                        <option value=""></option>
+                                        <option value="schatten" {% if plant.light_requirement == "schatten" %} selected {% endif %}>Schatten</option>
+                                        <option value="halbschatten" {% if plant.light_requirement == "halbschatten" %} selected {% endif %}>Halbschatten</option>
+                                        <option value="sonnig" {% if plant.light_requirement == "sonnig" %} selected {% endif %}>Sonnig</option>
+                                    </select></th>
+                                    <th><select name="water_requirement" placeholder="Benötigtes Wasser" value="{{ plant.water_requirement }}">
+                                        <option value=""></option>
+                                        <option value="wenig" {% if plant.water_requirement == "wenig" %} selected {% endif %}>Wenig</option>
+                                        <option value="mittel" {% if plant.water_requirement == "mittel" %} selected {% endif %}>Mittel</option>
+                                        <option value="viel" {% if plant.water_requirement == "viel" %} selected {% endif %}>Viel</option>
+                                    </select></th>
+                                    <th><select name="temperature_requirement" placeholder="Benötigte Temperatur" value="{{ plant.temperature_requirement }}">
+                                        <option value=""></option>
+                                        <option value="kalt" {% if plant.temperature_requirement == "kalt" %} selected {% endif %}>Kalt</option>
+                                        <option value="normal" {% if plant.temperature_requirement == "normal" %} selected {% endif %}>Normal</option>
+                                        <option value="warm" {% if plant.temperature_requirement == "warm" %} selected {% endif %}>Warm</option>
+                                    </select></th>
+                                    <th><select name="humidity_requirement" placeholder="Benötigte Feuchtigkeit" value="{{ plant.humidity_requirement }}">
+                                        <option value=""></option>
+                                        <option value="trocken" {% if plant.humidity_requirement == "trocken" %} selected {% endif %}>Trocken</option>
+                                        <option value="normal" {% if plant.humidity_requirement == "normal" %} selected {% endif %}>Normal</option>
+                                        <option value="feucht" {% if plant.humidity_requirement == "feucht" %} selected {% endif %}>Feucht</option>
+                                    </select></th>
+                                    <th><input name="soil_type" placeholder="Bodenart" value="{{ plant.soil_type }}"></th>
+                                    <th><input type="number" min="0" step="1" name="height_min" placeholder="Minimale Höhe" value="{{ plant.height_min }}"></th>
+                                    <th><input type="number" min="0" step="1" name="height_max" placeholder="Maximale Höhe" value="{{ plant.height_max }}"></th>
+                                    <th><input type="checkbox" name="poisonous" placeholder="Giftig" {% if plant.poisonous %} checked {% endif %}></th>
+                                    <th><input type="number" min="0" max="12" step="1" name="flowering_season_start" placeholder="Blüte Anfang" value="{{ plant.flowering_season_start }}"></th>
+                                    <th><input type="number" min="0" max="12" step="1" name="flowering_season_end" placeholder="Büte Ende" value="{{ plant.flowering_season_end }}"></th>
+                                    <th><input name="flower_color" placeholder="BlumenFarbe" value="{{ plant.flower_color }}"></th>
+                                    <th><input name="notes" placeholder="Notizen" value="{{ plant.notes }}"></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <a href="/plants/{{plant.id}}/update"><button>Speichern</button></a> <!-- Klappt nicht -->
                     </div>
                 </form>
                 <a href="/"><button>Abbrechen</button></a>

@@ -30,7 +30,9 @@
         </header>
 
         <!-- !!! Fehlermendung Ausgeben !!! -->
-        <h2>{{ error }}</h2>
+        {% if error %}
+            <h2 class="print_error">{{ error }}</h2>
+        {% endif %}
 
 
         
@@ -76,7 +78,7 @@
                         </table>
                     </div>
                     <div class="col-6">
-                        <button type="submit" name="action" value="save">Speichern</button>
+                        <a href="/locations/create"><button>Speichern</button></a>
                     </div>
                 </form>
                 <a href="/"><button>Abbrechen</button></a>
@@ -104,7 +106,7 @@
                             <td>{{ loc.description }}</td>
                             <td>
                                 <a href="/locations/{{loc.id}}/edit">Standort bearbeiten</a>
-                                <a href="/api/locations/{{loc.id}}">Standort löschen</a>
+                                <a href="/api/locations/{{loc.id}}">Standort löschen</a>  <!-- Klappt? -->
                             </td>
                         </tr>
                         {% endfor %}

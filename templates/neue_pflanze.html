@@ -29,7 +29,9 @@
         </header>
 
         <!-- !!! Fehlermendung Ausgeben !!! -->
-        <h2>{{ error }}</h2>
+        {% if error %}
+            <h2 class="print_error">{{ error }}</h2>
+        {% endif %}
 
         <!-- Content Bereich -->
         <div class="continer">
@@ -54,14 +56,15 @@
                                 <th>Büte Ende</th>
                                 <th>Pflanzenfarbe</th>
                                 <th>Notizen</th>
+                                <th>Ist bereit Erworben</th>
                             </thead>
                             <tbody>
                                 <tr>
                                     <th><input name="name" placeholder="Name"></th>
-                                    <th><select name="location" placeholder="Standort">
+                                    <th><select name="location_id" placeholder="Standort">
                                         <option value=""></option>
                                         {% for location in locations %}
-                                            <option value="{{ location.name }}">{{ location.name }}</option>
+                                            <option value="{{ location.id }}">{{ location.name }}</option>
                                         {% endfor %}
                                     </select></th>
                                     <th><input name="botanical_name" placeholder="Botanischer Name"></th>
@@ -97,14 +100,12 @@
                                     <th><input type="number" min="0" max="12" step="1" name="flowering_season_end" placeholder="Büte Ende"></th>
                                     <th><input name="flower_color" placeholder="Pflanzenfarbe"></th>
                                     <th><input name="notes" placeholder="Notizen"></th>
+                                    <th><input type="checkbox" name="is_purchased" placeholder="Ist bereit Erworben"></th>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-6">
-                        <button type="submit" name="action" value="save_whishlist">Auf Wunschliste speichern</button>
-                        <button type="submit" name="action" value="save_inventory">Auf Bestand speichern</button>
-                    </div>
+                    <a href="/plants/create"><button>Speichern</button></a> <!-- Klappt nicht! -->
                 </form>
                 <a href="/"><button>Abbrechen</button></a>
             </div>

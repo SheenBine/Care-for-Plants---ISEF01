@@ -27,8 +27,9 @@
         </header>
 
         <!-- !!! Fehlermendung Ausgeben !!! -->
-        <h2>{{ error }}</h2>
-
+        {% if error %}
+            <h2 class="print_error">{{ error }}</h2>
+        {% endif %}
         <!-- Content Bereich -->
         <div class="continer">
             <div class="row">
@@ -48,21 +49,21 @@
                                     <th><input name="name" placeholder="Name" value="{{ location.name }}"></th>
                                     <th><select name="lighting_condition" placeholder="Lichtverhältnisse" value="{{ location.lighting_condition }}">
                                         <option value=""></option>
-                                        <option value="schatten">Schatten</option>
-                                        <option value="halbschatten">Halbschatten</option>
-                                        <option value="sonnig">Sonnig</option>
+                                        <option value="schatten" {% if location.lighting_condition == "schatten" %} selected {% endif %}>Schatten</option>
+                                        <option value="halbschatten" {% if location.lighting_condition == "halbschatten" %} selected {% endif %}>Halbschatten</option>
+                                        <option value="sonnig" {% if location.lighting_condition == "sonnig" %} selected {% endif %}>Sonnig</option>
                                     </select></th>
                                     <th><select name="temperature" placeholder="Temperatur" value="{{ location.temperature }}">
                                         <option value=""></option>
-                                        <option value="kalt">Kalt</option>
-                                        <option value="normal">Normal</option>
-                                        <option value="warm">Warm</option>
+                                        <option value="kalt" {% if location.temperature == "kalt" %} selected {% endif %}>Kalt</option>
+                                        <option value="normal" {% if location.temperature == "normal" %} selected {% endif %}>Normal</option>
+                                        <option value="warm" {% if location.temperature == "warm" %} selected {% endif %}>Warm</option>
                                     </select></th>
                                     <th><select name="humidity" placeholder="Luftfeuchtigkeit" value="{{ location.humidity }}">
                                         <option value=""></option>
-                                        <option value="trocken">Trocken</option>
-                                        <option value="normal">Normal</option>
-                                        <option value="feucht">Feucht</option>
+                                        <option value="trocken" {% if location.humidity == "trocken" %} selected {% endif %}>Trocken</option>
+                                        <option value="normal" {% if location.humidity == "normal" %} selected {% endif %}>Normal</option>
+                                        <option value="feucht" {% if location.humidity == "feucht" %} selected {% endif %}>Feucht</option>
                                     </select></th>
                                     <th><input name="description" placeholder="Beschreibung" value="{{ location.description }}"></th>
                                 </tr>
@@ -71,7 +72,7 @@
 
                     </div>
                     <div class="col-6">
-                        <button type="submit" name="action" value="save">Speichern</button>
+                        <a href="/locations/{{ location.id }}/update"><button>Speichern</button></a>
                     </div>
                 </form>
                 <a href="/"><button>Abbrechen</button></a>

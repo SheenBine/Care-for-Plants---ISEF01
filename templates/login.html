@@ -23,7 +23,10 @@
 
 
         <!-- !!! Fehlermendung Ausgeben !!! -->
-        <h2>{{ error }}</h2>
+        {% if error %}
+            <h2 class="print_error">{{ error }}</h2>
+        {% endif %}
+        
 
 
     <!-- Login Bar -->

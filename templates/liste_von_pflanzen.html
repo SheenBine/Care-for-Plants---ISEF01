@@ -39,7 +39,7 @@
                     </a>
                     {% for location in locations %}
                     <br>
-                    <a href="/inventory/{{ location.id }}">
+                    <a href="/plants?{{ location.id }}">
                         <button class="location_button">{{ location.name }}</button>
                     </a>
                     {% endfor %} <!-- URL Geben -->
@@ -85,7 +85,7 @@
                             <td>{{ p.flower_color }}</td>
                             <td>{{ p.notes }}</td>
                             <td>
-                                <a href="">Zur Wunschliste hinzufügen</a> <!-- URL Geben -->
+                                <a href="/catalog/{{p.id}}/add-to-wishlist"><button>Zur Wunschliste hinzufügen</button></a> <!-- Klappt der Filter --> <!-- Klappt nicht -->
                             </td>
                         </tr>
                         {% endfor %}

@@ -42,7 +42,7 @@
                     <a href="/wishlist?location_id={{ location.id }}">
                         <button class="location_button">{{ location.name }}</button>
                     </a>
-                    {% endfor %}<!-- URL Geben -->
+                    {% endfor %}
                 </div>
                 <!-- Tabelle mit Pflanzen -->
                 <div class="col-4">
@@ -72,7 +72,7 @@
                         {% for p in plants %}
                         <tr>
                             <td>{{ p.name }}</td>
-                            <td>{{ p.location }}</td>
+                            <td>{{ p.location }}</td> <!-- Noch geben -->
                             <td>{{ p.botanical_name }}</td>
                             <td>{{ p.light_requirement }}</td>
                             <td>{{ p.water_requirement }}</td>
@@ -87,9 +87,9 @@
                             <td>{{ p.flower_color }}</td>
                             <td>{{ p.notes }}</td>
                             <td>
-                                <a href="/plants/{{p.id}}/edit">Pflanze bearbeiten</a>
-                                <a href="">Pflanze löschen</a> <!-- URL Geben -->
-                                <a href="">Pflanze zu Bestand hinzufügen</a> <!-- URL Geben -->
+                                <a href="/plants/{{p.id}}/edit"><button>Pflanze bearbeiten</button></a>
+                                <a href="/plants/{{p.id}}/delete"><button>Pflanze löschen</button></a> <!-- Klappt nicht -->
+                                <a href="/plants/{{p.id}}/move-to-inventory"><button>Pflanze zu Bestand hinzufügen</button></a> <!-- Klappt nicht -->
                             </td>
                         </tr>
                         {% endfor %}
