@@ -2068,6 +2068,42 @@ def update_location(location_id):
             location=location_data,
             error=f"Fehler beim Speichern: {str(e)}"
         )
+    
+@app.route('/locations/<int:location_id>/delete', methods=['POST'])
+def delete_location_form(location_id):
+    '''
+    Standort über HTML-Formular löschen
+    '''
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    user_id = session['user_id']
+
+    location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    if not location:
+        locations = get_user_locations(user_id)
+        return render_template(
+            'standorte.html',
+            username=session['username'],
+            locations=locations,
+            error="Standort nicht gefunden"
+        )
+
+    try:
+        db.session.delete(location)
+        db.session.commit()
+        return redirect(url_for('locations_page'))
+
+    except Exception as e:
+        db.session.rollback()
+        locations = get_user_locations(user_id)
+        return render_template(
+            'standorte.html',
+            username=session['username'],
+            locations=locations,
+            error=f"Fehler beim Löschen: {str(e)}"
+        )
+
 # App starten
 if __name__ == '__main__':
     app.run(debug=True)
