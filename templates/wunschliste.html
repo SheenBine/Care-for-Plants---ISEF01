@@ -72,7 +72,15 @@
                         {% for p in plants %}
                         <tr>
                             <td>{{ p.name }}</td>
-                            <td>{{ p.location }}</td> <!-- Noch geben -->
+                            {% if p.location_id != None %}
+                                {% for location in locations %}
+                                    {% if location.id == p.location_id %}
+                                        <td>{{ location.name }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <td>None</td>
+                            {% endif %}
                             <td>{{ p.botanical_name }}</td>
                             <td>{{ p.light_requirement }}</td>
                             <td>{{ p.water_requirement }}</td>

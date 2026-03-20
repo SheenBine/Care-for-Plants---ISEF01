@@ -57,10 +57,10 @@
                             <tbody>
                                 <tr>
                                     <th><input name="name" placeholder="Name" value="{{ plant.name }}"></th>
-                                    <th><select name="location" placeholder="Standort" value="{{ plant.location }}">
+                                    <th><select name="location_id" placeholder="Standort">
                                         <option value=""></option>
                                         {% for location in locations %}
-                                            <option value="{{ location.name }}" >{{ location.name }}</option> <!-- Muss ich noch machen-->
+                                            <option value="{{ location.id }}" {% if location.id == plant.location_id %} selected {% endif %}>{{ location.name }}</option> <!-- Muss ich noch machen-->
                                         {% endfor %}
                                     </select></th>
                                     <th><input name="botanical_name" placeholder="Botanischer Name" value="{{ plant.botanical_name }}"></th>
