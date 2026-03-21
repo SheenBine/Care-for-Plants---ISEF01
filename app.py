@@ -2,8 +2,9 @@ import os
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 from models import db, User, Location, Plant, PlantCatalog
 
-# localhost:5000/ http://localhost:5000/
-# Flask-App erstellen
+
+### App-Konfiguration & Initialisierung
+
 app = Flask(__name__)
 
 # Absoluter Pfad zum Projektordner und zur SQLite-Datei im lokalen database-Ordner
@@ -17,6 +18,9 @@ app.config['SECRET_KEY'] = 'thisisasecretkey'
 
 # Datenbank mit Flask verbinden
 db.init_app(app)
+
+
+### Initiale Demo- & Seed-Daten
 
 # Tabellen in der Datenbank anlegen, falls noch nicht vorhanden
 with app.app_context():
@@ -223,10 +227,12 @@ with app.app_context():
         db.session.add_all([monstera, ficus])
         db.session.commit()
 
-# Hilfsfunktionen
+
+### Hilfsfunktionen
+
 def require_login():
     '''
-    Prüft, ob User eingeloggt
+    Prüft ob User eingeloggt
     '''
     user_id = session.get('user_id')
     if not user_id:
@@ -370,7 +376,8 @@ def redirect_by_purchase_status(is_purchased):
         return redirect(url_for('inventory_page'))
     return redirect(url_for('wishlist_page'))
 
-# Validierung der Enum-Felder
+
+### Validierung & Konstanten
 
 ALLOWED_LIGHT = {"schatten", "halbschatten", "sonnig"}
 ALLOWED_TEMP = {"kalt", "normal", "warm"}
@@ -394,7 +401,9 @@ def validate_enum(field_name, value, allowed_values):
 
     return True, None
 
-# 3-stufige Eignungsprüfung mit geeignet/bedingt geeignet/ungeeignet
+
+### Eignungsprüfung & Empfehlungslogik
+
 def compare_enum_values(plant_value, location_value, ordered_values):
     '''
     Vergleicht Enum-Werte
@@ -654,7 +663,9 @@ def build_recommendations(user_id, selected_location=None):
 
     return recommendations
 
-# Routen
+
+### HTML-Routen
+
 @app.route('/')
 def home():
     '''
@@ -662,11 +673,9 @@ def home():
     Prüft, ob ein User eingeloggt ist.
     Falls nicht, wird auf die Login-Seite weitergeleitet.
     '''
-    # Prüfen, ob ein User eingeloggt ist
     if 'username' not in session:
         return redirect(url_for('auth'))
     
-    # User ist eingeloggt -> index.html anzeigen
     return render_template('index.html', username=session['username'])
 
 
@@ -711,7 +720,6 @@ def auth():
             else:
                 return render_template('login.html', error="Login fehlgeschlagen!")
 
-    # Standardmäßig GET, um Login/Registrierung zu zeigen
     return render_template('login.html', error=None)
 
 
@@ -1216,6 +1224,9 @@ def edit_location_page(location_id):
         location=location_data,
         error=None
     )
+
+
+### API-Routen
 
 @app.route('/api/wishlist', methods=['GET'])
 def list_wishlist():
@@ -2116,6 +2127,7 @@ def delete_location_form(location_id):
             error=f"Fehler beim Löschen: {str(e)}"
         )
 
-# App starten
+
+### App-Start
 if __name__ == '__main__':
     app.run(debug=True)
