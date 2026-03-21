@@ -20,13 +20,10 @@
 
             <!-- Navigation -->
             <nav class="nav_Leiste">
-
                 <ul>
                     <li><a href="/">Menü</a></li>
                 </ul>
-                
             </nav>
-
         </header>
 
         <!-- !!! Fehlermendung Ausgeben !!! -->
@@ -37,6 +34,7 @@
         <!-- Content Bereich -->
         <div class="continer">
             <div class="row">
+
                 <!-- Standort Buttons -->
                 <div class="col-2">
                     <a href="/wishlist">
@@ -49,10 +47,11 @@
                     </a>
                     {% endfor %}
                 </div>
+
                 <!-- Tabelle mit Pflanzen -->
                 <div class="col-4">
                     {% if plants|length < 1 %}
-                        <h4 style="text-align: center">Es gibt noch keine Pflanzen in deiner Wunschliste</h4>
+                        <h4 class="print_error">Es gibt noch keine Pflanzen in deiner Wunschliste</h4>
                     {% else %}
                     <table>
                         <thead>
@@ -113,7 +112,6 @@
                         </tbody>
                     </table>
                     {% endif %}
-
                 </div>
             </div>
         </div>

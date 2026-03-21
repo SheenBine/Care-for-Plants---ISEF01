@@ -20,41 +20,38 @@
 
             <!-- Navigation -->
             <nav class="nav_Leiste">
-
                 <ul>
                     <li><a href="/">Menü</a></li>
                 </ul>
-                
             </nav>
-
         </header>
-
 
         <!-- !!! Fehlermendung Ausgeben !!! -->
         {% if error %}
             <h2 class="print_error">{{ error }}</h2>
         {% endif %}
 
-
         <!-- Content Bereich -->
         <div class="continer">
             <div class="row">
+
                 <!-- Standort Buttons -->
                 <div class="col-2">
                     <a href="/inventory">
                         <button class="location_button">Alle Pflanzen</button>
                     </a>
                     {% for location in locations %}
-                    <br>
-                    <a href="/inventory?location_id={{ location.id }}">
-                        <button class="location_button">{{ location.name }}</button>
-                    </a>
+                        <br>
+                        <a href="/inventory?location_id={{ location.id }}">
+                            <button class="location_button">{{ location.name }}</button>
+                        </a>
                     {% endfor %}
                 </div>
+
                 <!-- Tabelle mit Pflanzen -->
                 <div class="col-4">
                     {% if plants|length < 1 %}
-                        <h4 style="text-align: center">Es gibt noch keine Pflanzen in deinem Bestand</h4>
+                        <h4 class="print_error">Es gibt noch keine Pflanzen in deinem Bestand</h4>
                     {% else %}
                     <table>
                         <thead>
@@ -112,7 +109,6 @@
                         </tbody>
                     </table>
                     {% endif %}
-
                 </div>
             </div>
         </div>

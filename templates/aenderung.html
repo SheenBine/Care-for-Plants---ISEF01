@@ -34,6 +34,7 @@
         <div class="continer">
             <div class="row">
                 <form action="/plants/{{plant.id}}/update" method="POST">
+
                 <!-- Tabelle mit Pflanzen -->
                     <div class="col-6">
                         <table>
@@ -60,7 +61,7 @@
                                     <th><select name="location_id" placeholder="Standort">
                                         <option value=""></option>
                                         {% for location in locations %}
-                                            <option value="{{ location.id }}" {% if location.id == plant.location_id %} selected {% endif %}>{{ location.name }}</option> <!-- Muss ich noch machen-->
+                                            <option value="{{ location.id }}" {% if location.id == plant.location_id %} selected {% endif %}>{{ location.name }}</option>
                                         {% endfor %}
                                     </select></th>
                                     <th><input name="botanical_name" placeholder="Botanischer Name" value="{{ plant.botanical_name }}"></th>
