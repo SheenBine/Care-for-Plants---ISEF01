@@ -1375,7 +1375,7 @@ def move_plant_to_inventory(plant_id):
     try:
         plant.is_purchased = True
         db.session.commit()
-        return redirect(url_for('inventory_page'))
+        return redirect_by_purchase_status(True)
 
     except Exception:
         db.session.rollback()
