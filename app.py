@@ -992,6 +992,7 @@ def edit_plant_page(plant_id):
         )
 
     locations = get_user_locations(user_id)
+
     plant_data = build_plant_data(plant, user_id)
 
     return render_template(
@@ -1013,7 +1014,7 @@ def update_plant_form(plant_id):
     user_id = session['user_id']
     locations = get_user_locations(user_id)
 
-    plant = Plant.query.filter_by(id=plant_id, user_id=user_id).first()
+    plant = get_user_plant_or_none(plant_id, user_id)
     if not plant:
         return render_template(
             'aenderung.html',
@@ -1197,7 +1198,7 @@ def edit_location_page(location_id):
 
     user_id = session['user_id']
 
-    location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    location = get_user_location_or_none(location_id, user_id)
     if not location:
         return render_template(
             'aendern_standort.html',
@@ -2008,7 +2009,7 @@ def update_location(location_id):
 
     user_id = session['user_id']
 
-    location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    location = get_user_location_or_none(location_id, user_id)
     if not location:
         return render_template(
             'aendern_standort.html',
