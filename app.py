@@ -1534,7 +1534,7 @@ def delete_location(location_id):
     if err:
         return err
 
-    loc = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    loc = get_user_location_or_none(location_id, user_id)
     if not loc:
         return jsonify({"error": "Standort nicht gefunden"}), 404
 
@@ -1559,8 +1559,7 @@ def list_plants_by_location(location_id):
     if err:
         return err
 
-    # Standort prüfen
-    loc = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    loc = get_user_location_or_none(location_id, user_id)
     if not loc:
         return jsonify({"error": "Standort nicht gefunden"}), 404
 
@@ -1588,11 +1587,11 @@ def check_plant_for_location(plant_id, location_id):
     if err:
         return err
 
-    plant = Plant.query.filter_by(id=plant_id, user_id=user_id).first()
+    plant = get_user_plant_or_none(plant_id, user_id)
     if not plant:
         return jsonify({"error": "Pflanze nicht gefunden"}), 404
 
-    location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    location = get_user_location_or_none(location_id, user_id)
     if not location:
         return jsonify({"error": "Standort nicht gefunden"}), 404
 
@@ -1648,7 +1647,7 @@ def recommend_plants_for_location(location_id):
         return err
 
     # Standort prüfen
-    location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    location = get_user_location_or_none(location_id, user_id)
     if not location:
         return jsonify({"error": "Standort nicht gefunden"}), 404
 
