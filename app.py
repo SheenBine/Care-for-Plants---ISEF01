@@ -354,6 +354,28 @@ def parse_location_id_from_form(user_id):
 
     return location_id, None
 
+def get_user_plant_or_none(plant_id, user_id):
+    '''
+    Lädt eine Pflanze nur wenn sie dem eingeloggten User gehört
+    '''
+    return Plant.query.filter_by(id=plant_id, user_id=user_id).first()
+
+
+def get_user_location_or_none(location_id, user_id):
+    '''
+    Lädt einen Standort nur wenn er dem eingeloggten User gehört
+    '''
+    return Location.query.filter_by(id=location_id, user_id=user_id).first()
+
+
+def redirect_by_purchase_status(is_purchased):
+    '''
+    Leitet abhängig vom Pflanzenstatus auf Bestand oder Wunschliste weiter
+    '''
+    if is_purchased:
+        return redirect(url_for('inventory_page'))
+    return redirect(url_for('wishlist_page'))
+
 # Validierung der Enum-Felder
 
 ALLOWED_LIGHT = {"schatten", "halbschatten", "sonnig"}
@@ -1123,7 +1145,7 @@ def delete_plant(plant_id):
 
     user_id = session['user_id']
 
-    plant = Plant.query.filter_by(id=plant_id, user_id=user_id).first()
+    plant = get_user_plant_or_none(plant_id, user_id)
     if not plant:
         return redirect(url_for('wishlist_page'))
 
@@ -1132,10 +1154,7 @@ def delete_plant(plant_id):
     try:
         db.session.delete(plant)
         db.session.commit()
-
-        if was_purchased:
-            return redirect(url_for('inventory_page'))
-        return redirect(url_for('wishlist_page'))
+        return redirect_by_purchase_status(was_purchased)
 
     except Exception:
         db.session.rollback()
