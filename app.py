@@ -232,13 +232,6 @@ def require_login():
         return None, (jsonify({"error": "Nicht eingeloggt"}), 401)
     return user_id, None
 
-def get_logged_in_user_id():
-    '''
-    Liefert die user_id aus der Session für HTML-Seiten
-    Gibt None zurück, wenn niemand eingeloggt ist
-    '''
-    return session.get('user_id')
-
 
 def get_user_locations(user_id):
     '''
