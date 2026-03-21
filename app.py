@@ -223,6 +223,7 @@ with app.app_context():
         db.session.add_all([monstera, ficus])
         db.session.commit()
 
+# Hilfsfunktionen
 def require_login():
     '''
     Prüft, ob User eingeloggt
