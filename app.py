@@ -2098,7 +2098,7 @@ def delete_location_form(location_id):
 
     user_id = session['user_id']
 
-    location = Location.query.filter_by(id=location_id, user_id=user_id).first()
+    location = get_user_location_or_none(location_id, user_id)
     if not location:
         locations = get_user_locations(user_id)
         return render_template(
