@@ -5,12 +5,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 # Datenbank wird in app.py importiert und mit Flask verbunden
 db = SQLAlchemy()
 
+
 class User(db.Model):
     '''
-    Usermodell für Authentifizierung
-    - id: Primärschlüssel
-    - username: eindeutiger Name des Benutzers
-    - password_hash: sicher gespeicherter Hash des Passworts
+    Benutzerkonto für Login und Registrierung
     '''
     __tablename__ = "users"
 
@@ -20,25 +18,20 @@ class User(db.Model):
 
     def set_password(self, password):
         '''
-        Passwort setzen.
-        Hasht das Passwort, damit es nicht in Klartext gespeichert wird.
+        Speichert das Passwort als Hash
         '''
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         '''
-        Prüft, ob ein Klartext-Passwort zum gespeicherten Hash passt.
-        Gibt True zurück, sonst False.
+        Prüft ein Passwort gegen den gespeicherten Hash
         '''
         return check_password_hash(self.password_hash, password)
-    
+
+
 class Location(db.Model):
     '''
-    Standortmodell
-    - id: Primärschlüssel
-    - user_id: gehört zu einem User
-    - name: Name des Standorts
-    - lighting_condition / temperature / humidity: Enum-Strings
+    Benutzerbezogener Standort für Pflanzen
     '''
     __tablename__ = "locations"
 
@@ -46,53 +39,47 @@ class Location(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
 
     name = db.Column(db.String(120), nullable=False)
-    lighting_condition = db.Column(db.String(20))   # schatten, halbschatten, sonnig
-    temperature = db.Column(db.String(20))          # kalt, normal, warm
-    humidity = db.Column(db.String(20))             # trocken, normal, feucht
+    lighting_condition = db.Column(db.String(20))
+    temperature = db.Column(db.String(20))
+    humidity = db.Column(db.String(20))
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
 
+
 class Plant(db.Model):
     '''
-    Pflanzenmodell
-    - user_id: Pflanzen pro User speichern
-    - is_purchased: False = Wunschliste, True = gekauft/bestand
-    - location_id: kann nach Kauf gesetzt werden
+    Benutzerbezogene Pflanze für Wunschliste oder Bestand
     '''
     __tablename__ = "plants"
 
     id = db.Column(db.Integer, primary_key=True)
-
-    # pro User
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
 
     name = db.Column(db.String(120), nullable=False)
     botanical_name = db.Column(db.String(200))
 
-    # Standortanforderungen
-    light_requirement = db.Column(db.String(20))      # schatten, halbschatten, sonnig
-    water_requirement = db.Column(db.String(20))      # wenig, mittel, viel
+    light_requirement = db.Column(db.String(20))
+    water_requirement = db.Column(db.String(20))
     temperature_requirement = db.Column(db.String(20))
-    humidity_requirement = db.Column(db.String(20))   # trocken, normal, feucht
+    humidity_requirement = db.Column(db.String(20))
     soil_type = db.Column(db.String(120))
 
-    # Eigenschaften
-    height_min = db.Column(db.Integer)                
-    height_max = db.Column(db.Integer)                
+    height_min = db.Column(db.Integer)
+    height_max = db.Column(db.Integer)
     poisonous = db.Column(db.Boolean, default=False)
-    flowering_season_start = db.Column(db.Integer)    
-    flowering_season_end = db.Column(db.Integer)      
+    flowering_season_start = db.Column(db.Integer)
+    flowering_season_end = db.Column(db.Integer)
     flower_color = db.Column(db.String(80))
 
-    # Status
     is_purchased = db.Column(db.Boolean, default=False)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id', ondelete="SET NULL"), nullable=True)
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
 
+
 class PlantCatalog(db.Model):
     '''
-    Pflanzenkatalog für Empfehlungen
+    Allgemeiner Pflanzenkatalog für Empfehlungen
     '''
     __tablename__ = "plant_catalog"
 
@@ -101,10 +88,10 @@ class PlantCatalog(db.Model):
     name = db.Column(db.String(120), nullable=False)
     botanical_name = db.Column(db.String(200))
 
-    light_requirement = db.Column(db.String(20))        
-    water_requirement = db.Column(db.String(20))        
-    temperature_requirement = db.Column(db.String(20))  
-    humidity_requirement = db.Column(db.String(20))     
+    light_requirement = db.Column(db.String(20))
+    water_requirement = db.Column(db.String(20))
+    temperature_requirement = db.Column(db.String(20))
+    humidity_requirement = db.Column(db.String(20))
     soil_type = db.Column(db.String(120))
 
     height_min = db.Column(db.Integer)
