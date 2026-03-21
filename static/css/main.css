@@ -217,6 +217,10 @@ body {
     color: red;
 }
 
+.no_plant_error {
+    text-align: center;
+}
+
     /*Tabellen*/
 
 table, th {
