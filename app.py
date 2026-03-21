@@ -740,7 +740,7 @@ def wishlist_page():
     if 'username' not in session:
         return redirect(url_for('auth'))
 
-    user_id = get_logged_in_user_id()
+    user_id = session['user_id']
     locations = get_user_locations(user_id)
     selected_location = get_selected_location(user_id)
 
@@ -771,7 +771,7 @@ def inventory_page():
     if 'username' not in session:
         return redirect(url_for('auth'))
 
-    user_id = get_logged_in_user_id()
+    user_id = session['user_id']
     locations = get_user_locations(user_id)
     selected_location = get_selected_location(user_id)
 
