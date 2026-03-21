@@ -981,7 +981,7 @@ def edit_plant_page(plant_id):
 
     user_id = session['user_id']
 
-    plant = Plant.query.filter_by(id=plant_id, user_id=user_id).first()
+    plant = get_user_plant_or_none(plant_id, user_id)
     if not plant:
         return render_template(
             'aenderung.html',
@@ -992,7 +992,6 @@ def edit_plant_page(plant_id):
         )
 
     locations = get_user_locations(user_id)
-
     plant_data = build_plant_data(plant, user_id)
 
     return render_template(
