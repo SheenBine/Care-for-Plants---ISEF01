@@ -816,12 +816,11 @@ def locations_page():
 def plants_page():
     '''
     HTML-Seite für Pflanzenempfehlungen anzeigen
-    Optional nach Standort filterbar über ?location_id=
     '''
     if 'username' not in session:
         return redirect(url_for('auth'))
 
-    user_id = get_logged_in_user_id()
+    user_id = session['user_id']
     locations = get_user_locations(user_id)
     selected_location = get_selected_location(user_id)
 
@@ -844,8 +843,9 @@ def new_plant_page():
     '''
     if 'username' not in session:
         return redirect(url_for('auth'))
-    
-    locations = get_user_locations(session['user_id'])
+
+    user_id = session['user_id']
+    locations = get_user_locations(user_id)
 
     return render_template(
         'neue_pflanze.html',
