@@ -54,6 +54,7 @@
                                 <th>Büte Ende</th>
                                 <th>Pflanzenfarbe</th>
                                 <th>Notizen</th>
+                                <th>Ist bereit Erworben</th>
                             </thead>
                             <tbody>
                                 <tr>
@@ -97,6 +98,7 @@
                                     <th><input type="number" min="0" max="12" step="1" name="flowering_season_end" placeholder="Büte Ende" value="{{ plant.flowering_season_end }}"></th>
                                     <th><input name="flower_color" placeholder="BlumenFarbe" value="{{ plant.flower_color }}"></th>
                                     <th><input name="notes" placeholder="Notizen" value="{{ plant.notes }}"></th>
+                                    <th><input type="checkbox" name="is_purchased" placeholder="Ist bereit Erworben" {% if plant.is_purchased %} checked {% endif %}></th>
                                 </tr>
                             </tbody>
                         </table>
